@@ -277,10 +277,14 @@ def update_orbit_filter(selected_area):
 def update_map(map_style, color_mode, orbit_filter, selected_area):
     if selected_area == 'wroclaw':
         data = all_data_wroclaw.drop_duplicates(subset=['pid'])
+        center_coords = {'lat': all_data_wroclaw['latitude'].mean(), 'lon': all_data_wroclaw['longitude'].mean()}
+        zoom_level = 14 
     elif selected_area == 'turow':
         data = all_data_turow.drop_duplicates(subset=['pid'])
+        center_coords = {'lat': 50.90803234267631, 'lon': 14.898742567091745}  
+        zoom_level = 12  
         orbit_filter = ['Ascending 73']
-
+  
     if isinstance(orbit_filter, str):
         orbit_filter = [orbit_filter]
 
@@ -304,7 +308,7 @@ def update_map(map_style, color_mode, orbit_filter, selected_area):
                                     'mean_velocity': 'Mean Velocity'
                                 },
                                 color='file',
-                                zoom=14)
+                                zoom=zoom_level) 
         fig.update_layout(legend_title_text='Orbit Type')
 
     elif color_mode == 'speed':
@@ -326,7 +330,7 @@ def update_map(map_style, color_mode, orbit_filter, selected_area):
                                     'height': 'Height',
                                     'mean_velocity': 'Mean Velocity'
                                 },
-                                zoom=14)
+                                zoom=zoom_level)
         fig.update_layout(legend_title_text='Mean Velocity[mm/year]')
 
     elif color_mode == 'anomaly_type':
@@ -355,10 +359,11 @@ def update_map(map_style, color_mode, orbit_filter, selected_area):
                                 },
                                 color=merged_data['is_anomaly'].map({True: 'Anomaly', False: 'No Anomaly'}),
                                 color_discrete_map={'Anomaly': 'red', 'No Anomaly': 'green'},
-                                zoom=14)
+                                zoom=zoom_level)
         fig.update_layout(legend_title_text='Anomaly Type')
 
-    fig.update_layout(mapbox_style=map_style, autosize=True, margin=dict(l=0, r=0, t=0, b=0))
+    fig.update_layout(mapbox_style=map_style, autosize=True, margin=dict(l=0, r=0, t=0, b=0),
+                      mapbox=dict(center=center_coords))
     return fig
 
 @app.callback(
