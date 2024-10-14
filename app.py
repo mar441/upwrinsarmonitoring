@@ -30,7 +30,7 @@ geo_data_1 = pd.read_csv('mos_1.csv')
 geo_data_2 = pd.read_csv('mos_2.csv')
 geo_data_3 = pd.read_csv('msz_1.csv')
 geo_data_4 = pd.read_csv('msz_2.csv')
-geo_data = pd.concat([geo_data_1, geo_data_2, geo_data_3, geo_data_4], ignore_index=True)
+geo_data_wroclaw = pd.concat([geo_data_1, geo_data_2, geo_data_3, geo_data_4], ignore_index=True)
 geo_data_wroclaw['pid'] = geo_data_wroclaw['pid'].astype(str).str.strip()  
 
 geo_data_turow = pd.read_csv('tr_73_1.csv')
