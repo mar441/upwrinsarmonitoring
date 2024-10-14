@@ -222,7 +222,7 @@ app.layout = html.Div([
             html.Label("Select Date Range", style={'font-size': '16px'}),
             dcc.DatePickerRange(
                 id='date-range-picker',
-                start_date=all_data_wroclaw['timestamp'].min(),
+                start_date=all_data_wroclaw['timestamp'].min(),  # Defaulting to Wrocław data initially
                 end_date=all_data_wroclaw['timestamp'].max(),
                 display_format='YYYY-MM-DD',
                 style={'height': '5px',
@@ -281,66 +281,31 @@ def update_map(map_style, color_mode, orbit_filter, selected_area):
         zoom_level = 14 
     elif selected_area == 'turow':
         data = all_data_turow.drop_duplicates(subset=['pid'])
-        center_coords = {'lat': 50.90803234267631, 'lon': 14.898742567091745}  
-        zoom_level = 12  
+        center_coords = {'lat': 50.90803234267631, 'lon': 14.898742567091745}
+        zoom_level = 12 
         orbit_filter = ['Ascending 73']
-  
+
     if isinstance(orbit_filter, str):
         orbit_filter = [orbit_filter]
 
     filtered_data = data[data['file'].isin(orbit_filter)]
     filtered_data.loc[:, 'mean_velocity'] = filtered_data['mean_velocity'].round(1)
 
-    if color_mode == 'orbit':
-        fig = px.scatter_mapbox(filtered_data,
-                                lat='latitude', lon='longitude',
-                                hover_name='pid',
-                                hover_data={
-                                    'latitude': True,
-                                    'longitude': True,
-                                    'height': True,
-                                    'mean_velocity': True
-                                },
-                                labels={
-                                    'latitude': 'Latitude',
-                                    'longitude': 'Longitude',
-                                    'height': 'Height',
-                                    'mean_velocity': 'Mean Velocity'
-                                },
-                                color='file',
-                                zoom=zoom_level) 
-        fig.update_layout(legend_title_text='Orbit Type')
-
-    elif color_mode == 'speed':
-        fig = px.scatter_mapbox(filtered_data,
-                                lat='latitude', lon='longitude',
-                                hover_name='pid',
-                                hover_data={
-                                    'latitude': True,
-                                    'longitude': True,
-                                    'height': True,
-                                    'mean_velocity': True
-                                },
-                                color='mean_velocity',
-                                color_continuous_scale='Jet',
-                                range_color=(-5, 5),
-                                labels={
-                                    'latitude': 'Latitude',
-                                    'longitude': 'Longitude',
-                                    'height': 'Height',
-                                    'mean_velocity': 'Mean Velocity'
-                                },
-                                zoom=zoom_level)
-        fig.update_layout(legend_title_text='Mean Velocity[mm/year]')
-
-    elif color_mode == 'anomaly_type':
+    if color_mode == 'anomaly_type':
         if selected_area == 'wroclaw':
-            merged_data = filtered_data.merge(all_anomaly_data_95_wroclaw[['pid', 'is_anomaly']], on='pid', how='left')
+            merged_data = filtered_data.merge(all_anomaly_data_99_wroclaw[['pid', 'is_anomaly']], on='pid', how='left')
         else:
-            merged_data = filtered_data.merge(anomaly_data_turow_95[['pid', 'is_anomaly']], on='pid', how='left')
+            merged_data = filtered_data.merge(anomaly_data_turow_99[['pid', 'is_anomaly']], on='pid', how='left')
 
         merged_data['is_anomaly'] = merged_data['is_anomaly'].fillna(False)
         merged_data['is_anomaly'] = merged_data['is_anomaly'].astype(bool)
+
+        merged_data['consecutive_anomalies'] = (
+            merged_data.groupby('pid')['is_anomaly']
+            .rolling(3, min_periods=3).sum().reset_index(0, drop=True)
+        )
+    
+        merged_data['anomaly_3plus'] = merged_data['consecutive_anomalies'] >= 3
 
         fig = px.scatter_mapbox(merged_data,
                                 lat='latitude', lon='longitude',
@@ -357,14 +322,109 @@ def update_map(map_style, color_mode, orbit_filter, selected_area):
                                     'height': 'Height',
                                     'mean_velocity': 'Mean Velocity'
                                 },
-                                color=merged_data['is_anomaly'].map({True: 'Anomaly', False: 'No Anomaly'}),
+                                color=merged_data['anomaly_3plus'].map({True: 'Anomaly', False: 'No Anomaly'}),
                                 color_discrete_map={'Anomaly': 'red', 'No Anomaly': 'green'},
                                 zoom=zoom_level)
         fig.update_layout(legend_title_text='Anomaly Type')
+    else:
+        if color_mode == 'orbit':
+            fig = px.scatter_mapbox(filtered_data,
+                                    lat='latitude', lon='longitude',
+                                    hover_name='pid',
+                                    hover_data={
+                                        'latitude': True,
+                                        'longitude': True,
+                                        'height': True,
+                                        'mean_velocity': True
+                                    },
+                                    labels={
+                                        'latitude': 'Latitude',
+                                        'longitude': 'Longitude',
+                                        'height': 'Height',
+                                        'mean_velocity': 'Mean Velocity'
+                                    },
+                                    color='file',
+                                    zoom=zoom_level)
+            fig.update_layout(legend_title_text='Orbit Type')
 
+        elif color_mode == 'speed':
+            fig = px.scatter_mapbox(filtered_data,
+                                    lat='latitude', lon='longitude',
+                                    hover_name='pid',
+                                    hover_data={
+                                        'latitude': True,
+                                        'longitude': True,
+                                        'height': True,
+                                        'mean_velocity': True
+                                    },
+                                    color='mean_velocity',
+                                    color_continuous_scale='Jet',
+                                    range_color=(-5, 5),
+                                    labels={
+                                        'latitude': 'Latitude',
+                                        'longitude': 'Longitude',
+                                        'height': 'Height',
+                                        'mean_velocity': 'Mean Velocity'
+                                    },
+                                    zoom=zoom_level)
+            fig.update_layout(legend_title_text='Mean Velocity[mm/year]')
+
+    # Final Map Layout
     fig.update_layout(mapbox_style=map_style, autosize=True, margin=dict(l=0, r=0, t=0, b=0),
                       mapbox=dict(center=center_coords))
     return fig
+
+@app.callback(
+    Output('selected-points', 'data'),
+    [Input('map', 'clickData')],
+    [State('selected-points', 'data')]
+)
+def update_selected_points(clickData, selected_points):
+    if clickData is None:
+        return selected_points
+    
+    point_id = clickData['points'][0]['hovertext']
+    lat = clickData['points'][0]['lat']
+    lon = clickData['points'][0]['lon']
+    
+    if selected_points['point_1'] is None:
+        selected_points['point_1'] = {'pid': point_id, 'lat': lat, 'lon': lon}
+    elif selected_points['point_2'] is None:
+        selected_points['point_2'] = {'pid': point_id, 'lat': lat, 'lon': lon}
+    else:
+        selected_points = {'point_1': None, 'point_2': None}
+
+    return selected_points
+
+@app.callback(
+    Output('distance-output', 'children'),
+    [Input('selected-points', 'data'),
+     Input('distance-calc-dropdown', 'value')]
+)
+def display_distance(selected_points, distance_calc_enabled):
+    if distance_calc_enabled == 'no':
+        return ""
+
+    point_1 = selected_points['point_1']
+    point_2 = selected_points['point_2']
+    
+    if point_1 is not None and point_2 is not None:
+        coords_1 = (point_1['lat'], point_1['lon'])
+        coords_2 = (point_2['lat'], point_2['lon'])
+
+        distance_km = geodesic(coords_1, coords_2).kilometers
+        
+        return html.Div([
+            html.H4("Selected Points and Distance"),
+            html.Ul([
+                html.Li(f"Point 1: {point_1['pid']} (Lat: {point_1['lat']}, Lon: {point_1['lon']})"),
+                html.Li(f"Point 2: {point_2['pid']} (Lat: {point_2['lat']}, Lon: {point_2['lon']})"),
+                html.Li(f"Distance: {distance_km:.2f} km")
+            ], style={'list-style-type': 'none', 'padding': '0', 'margin': '0'})
+        ], style={'padding': '10px', 'border': '1px solid #ddd', 'border-radius': '5px'})
+    else:
+        return "Select two points on the map to calculate the distance."
+
 
 @app.callback(
     [Output('date-range-picker', 'start_date'),
@@ -390,7 +450,7 @@ def update_date_picker(selected_area):
      Input('date-range-picker', 'end_date'),
      Input('y-axis-min', 'value'),
      Input('y-axis-max', 'value'),
-     Input('area-dropdown', 'value')]
+     Input('area-dropdown', 'value')] 
 )
 def display_displacement(clickData, start_date, end_date, y_min, y_max, selected_area):
     if clickData is None:
@@ -402,16 +462,16 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
     end_date = pd.to_datetime(end_date)
 
     if selected_area == 'wroclaw':
-        full_data = all_data_wroclaw[all_data_wroclaw['pid'] == point_id].copy()
+        full_data = all_data_wroclaw[all_data_wroclaw['pid'] == point_id].copy() 
         anomaly_data_95 = all_anomaly_data_95_wroclaw
         anomaly_data_99 = all_anomaly_data_99_wroclaw
-        last_n_data = full_data.tail(60)  
+        last_n_data = full_data.tail(60)
     else:
-        full_data = all_data_turow[all_data_turow['pid'] == point_id].copy() 
+        full_data = all_data_turow[all_data_turow['pid'] == point_id].copy()
         anomaly_data_95 = anomaly_data_turow_95
         anomaly_data_99 = anomaly_data_turow_99
-        last_n_data = full_data.tail(31)  
-        
+        last_n_data = full_data.tail(31) 
+
     last_n_data.set_index('timestamp', inplace=True)
 
     filtered_data = full_data[(full_data['timestamp'] >= start_date) & (full_data['timestamp'] <= end_date)].copy()
@@ -496,7 +556,7 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
     )
 
     return fig, {'display': 'block'}
-
+    
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
