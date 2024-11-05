@@ -36,6 +36,9 @@ geo_data_wroclaw['pid'] = geo_data_wroclaw['pid'].astype(str).str.strip()
 geo_data_turow = pd.read_csv('tr_73_1.csv')
 geo_data_turow['pid'] = geo_data_turow['pid'].astype(str).str.strip() 
 
+geo_data_turow_lstm = pd.read_csv('tr_geo_lstm.csv')
+geo_data_turow_lstm['pid'] = geo_data_turow_lstm['pid'].astype(str).str.strip()
+
 displacement_data_1 = load_displacement_data('mz2_10.csv', 'Descending 175')
 displacement_data_2 = load_displacement_data('mz4_3.csv', 'Ascending 124')
 displacement_data_3 = load_displacement_data('msz4_3.csv', 'Descending 175')
@@ -56,6 +59,10 @@ all_data_wroclaw = pd.concat([all_data_1, all_data_2, all_data_3, all_data_4], i
 displacement_data_5 = load_displacement_data('tr_73.csv', 'Ascending 73')
 displacement_data_5['pid'] = displacement_data_5['pid'].astype(str).str.strip() 
 all_data_turow = pd.merge(displacement_data_5, geo_data_turow, on='pid', how='left')
+
+displacement_data_turow_lstm = load_displacement_data('tr_73_lstm.csv', 'Ascending 73 LSTM')
+displacement_data_turow_lstm['pid'] = displacement_data_turow_lstm['pid'].astype(str).str.strip() 
+all_data_turow_lstm = pd.merge(displacement_data_turow_lstm, geo_data_turow_lstm, on='pid', how='left')
 
 prediction_data_1 = pd.read_csv('predictions_values.csv')
 prediction_data_1 = prediction_data_1.melt(var_name='pid', 
@@ -89,6 +96,11 @@ prediction_data_turow = prediction_data_turow.melt(var_name='pid',
 prediction_data_turow['label'] = 'Prediction Set 5'
 prediction_data_turow['step'] = prediction_data_turow.groupby('pid').cumcount()
 
+prediction_data_turow_lstm = pd.read_csv('predykcja_lstm.csv', delimiter=';')
+prediction_data_turow_lstm = prediction_data_turow_lstm.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_turow_lstm['label'] = 'LSTM Prediction Set'
+prediction_data_turow_lstm['step'] = prediction_data_turow_lstm.groupby('pid').cumcount()
+
 anomaly_data_1_95 = load_anomaly_data('anomaly_output_95.csv', 'Anomaly Set 1 (95%)')
 anomaly_data_2_95 = load_anomaly_data('anomaly_output2_95.csv', 'Anomaly Set 2 (95%)')
 anomaly_data_3_95 = load_anomaly_data('anomaly_output3_95.csv', 'Anomaly Set 3 (95%)')
@@ -109,6 +121,12 @@ all_anomaly_data_99_wroclaw = pd.concat([anomaly_data_1_99, anomaly_data_2_99, a
 anomaly_data_turow_99 = load_anomaly_data('anomaly_output5_99.csv', 'Anomaly Set 5 (99%)')
 anomaly_data_turow_99 = anomaly_data_turow_99.groupby('pid').head(31)
 
+anomaly_data_turow_95_lstm = load_anomaly_data('anomaly_lstm_95.csv', 'Anomaly Set 5 LSTM (95%)')
+anomaly_data_turow_95_lstm = anomaly_data_turow_95_lstm.groupby('pid').head(31)
+
+anomaly_data_turow_99_lstm = load_anomaly_data('anomaly_lstm_99.csv', 'Anomaly Set 5 LSTM (99%)')
+anomaly_data_turow_99_lstm = anomaly_data_turow_99_lstm.groupby('pid').head(31)
+
 all_data_wroclaw.sort_values(by=['pid', 'timestamp'], inplace=True)
 all_data_wroclaw['displacement_diff'] = all_data_wroclaw.groupby('pid')['displacement'].diff()
 all_data_wroclaw['time_diff'] = all_data_wroclaw.groupby('pid')['timestamp'].diff().dt.days
@@ -127,13 +145,22 @@ mean_velocity_data_turow = all_data_turow.groupby('pid')['displacement_speed'].m
 mean_velocity_data_turow.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
 all_data_turow = pd.merge(all_data_turow, mean_velocity_data_turow, on='pid', how='left')
 
+all_data_turow_lstm.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_turow_lstm['displacement_diff'] = all_data_turow_lstm.groupby('pid')['displacement'].diff()
+all_data_turow_lstm['time_diff'] = all_data_turow_lstm.groupby('pid')['timestamp'].diff().dt.days
+all_data_turow_lstm['displacement_speed'] = (all_data_turow_lstm['displacement_diff'] / all_data_turow_lstm['time_diff']) * 365
+
+mean_velocity_data_turow_lstm = all_data_turow_lstm.groupby('pid')['displacement_speed'].mean().reset_index()
+mean_velocity_data_turow_lstm.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_turow_lstm = pd.merge(all_data_turow_lstm, mean_velocity_data_turow_lstm, on='pid', how='left')
+
 px.set_mapbox_access_token('pk.eyJ1IjoibWFycGllayIsImEiOiJjbTBxbXBsMGQwYjgyMmxzN3RpdmlhZDVrIn0.YWJh1RM6HKfN_pbH-jtJ6A')
 
 app = dash.Dash(__name__)
 
 app.layout = html.Div([
     html.H3("Select Map and Data Visualization Options"),
-
+    
     html.Div([
         html.Div([
             html.Label("Map Style"),
@@ -150,7 +177,7 @@ app.layout = html.Div([
                 clearable=False,
                 style={'width': '100%'}
             )
-        ], style={'display': 'inline-block', 'width': '24%', 'padding': '10px'}),
+        ], style={'display': 'inline-block', 'width': '19%', 'padding': '10px'}),
 
         html.Div([
             html.Label("Visualization Option"),
@@ -165,7 +192,7 @@ app.layout = html.Div([
                 clearable=False,
                 style={'width': '100%'}
             )
-        ], style={'display': 'inline-block', 'width': '24%', 'padding': '10px'}),
+        ], style={'display': 'inline-block', 'width': '19%', 'padding': '10px'}),
 
         html.Div([
             html.Label("Filter by Orbit Type"),
@@ -180,7 +207,7 @@ app.layout = html.Div([
                 clearable=False,
                 style={'width': '100%'}
             )
-        ], style={'display': 'inline-block', 'width': '24%', 'padding': '10px'}),
+        ], style={'display': 'inline-block', 'width': '19%', 'padding': '10px'}),
 
         html.Div([
             html.Label("Select Area of Interest"),
@@ -194,7 +221,7 @@ app.layout = html.Div([
                 clearable=False,
                 style={'width': '100%'}
             )
-        ], style={'display': 'inline-block', 'width': '24%', 'padding': '10px'}),
+        ], style={'display': 'inline-block', 'width': '19%', 'padding': '10px'}),
         
         html.Div([
             html.Label("Enable Distance Calculation"),
@@ -208,13 +235,26 @@ app.layout = html.Div([
                 clearable=False,
                 style={'width': '100%'}
             )
-        ], style={'display': 'inline-block', 'width': '24%', 'padding': '10px'})
+        ], style={'display': 'inline-block', 'width': '19%', 'padding': '10px'})
     ], style={'width': '100%', 'display': 'flex', 'justify-content': 'space-between'}),
 
     html.Div(id='distance-output', style={'font-size': '16px', 'padding': '10px', 'color': 'black'}),
 
-    dcc.Graph(id='map', style={'height': '80vh', 'width': '95vw'}, config={'scrollZoom': True}),
+    html.Div(id='prediction-method-container', children=[
+        html.Label("Select Prediction Method"),
+        dcc.Dropdown(
+            id='prediction-method-dropdown',
+            options=[
+                {'label': 'Autoencoder', 'value': 'autoencoder'},
+                {'label': 'LSTM', 'value': 'lstm'}
+            ],
+            value='autoencoder',
+            clearable=False,
+            style={'width': '100%'}
+        )
+    ], style={'display': 'none', 'padding': '10px'}),
 
+    dcc.Graph(id='map', style={'height': '80vh', 'width': '95vw'}, config={'scrollZoom': True}),
     dcc.Store(id='selected-points', data={'point_1': None, 'point_2': None}),
 
     html.Div(id='displacement-container', children=[
@@ -222,15 +262,10 @@ app.layout = html.Div([
             html.Label("Select Date Range", style={'font-size': '16px'}),
             dcc.DatePickerRange(
                 id='date-range-picker',
-                start_date=all_data_wroclaw['timestamp'].min(),  # Defaulting to Wrocław data initially
+                start_date=all_data_wroclaw['timestamp'].min(), 
                 end_date=all_data_wroclaw['timestamp'].max(),
                 display_format='YYYY-MM-DD',
-                style={'height': '5px',
-                       'width': '300px',
-                       'font-family': 'Arial',
-                       'font-size': '4px',
-                       'display': 'inline-block',
-                       'padding': '5px'}
+                style={'height': '5px', 'width': '300px', 'font-family': 'Arial', 'font-size': '4px', 'display': 'inline-block', 'padding': '5px'}
             )
         ], style={'display': 'inline-block', 'padding': '10px'}),
 
@@ -253,6 +288,16 @@ app.layout = html.Div([
         dcc.Graph(id='displacement-graph', style={'height': '50vh', 'width': '95vw'})
     ], style={'display': 'none'})
 ])
+
+@app.callback(
+    Output('prediction-method-container', 'style'),
+    Input('area-dropdown', 'value')
+)
+def toggle_prediction_method_dropdown(selected_area):
+    if selected_area == 'turow':
+        return {'display': 'block', 'padding': '10px'}
+    else:
+        return {'display': 'none'}
 
 @app.callback(
     [Output('orbit-filter-dropdown', 'options'), 
@@ -283,7 +328,7 @@ def update_map(map_style, color_mode, orbit_filter, selected_area):
         data = all_data_turow.drop_duplicates(subset=['pid'])
         center_coords = {'lat': 50.90803234267631, 'lon': 14.898742567091745}
         zoom_level = 12 
-        orbit_filter = ['Ascending 73']
+        orbit_filter = ['Ascending 73'] 
 
     if isinstance(orbit_filter, str):
         orbit_filter = [orbit_filter]
@@ -297,81 +342,59 @@ def update_map(map_style, color_mode, orbit_filter, selected_area):
         else:
             merged_data = filtered_data.merge(anomaly_data_turow_99[['pid', 'is_anomaly']], on='pid', how='left')
 
-        merged_data['is_anomaly'] = merged_data['is_anomaly'].fillna(False)
-        merged_data['is_anomaly'] = merged_data['is_anomaly'].astype(bool)
-
+        merged_data['is_anomaly'] = merged_data['is_anomaly'].fillna(False).astype(bool)
         merged_data['consecutive_anomalies'] = (
             merged_data.groupby('pid')['is_anomaly']
             .rolling(3, min_periods=3).sum().reset_index(0, drop=True)
         )
-    
         merged_data['anomaly_3plus'] = merged_data['consecutive_anomalies'] >= 3
 
-        fig = px.scatter_mapbox(merged_data,
-                                lat='latitude', lon='longitude',
-                                hover_name='pid',
-                                hover_data={
-                                    'latitude': True,
-                                    'longitude': True,
-                                    'height': True,
-                                    'mean_velocity': True
-                                },
-                                labels={
-                                    'latitude': 'Latitude',
-                                    'longitude': 'Longitude',
-                                    'height': 'Height',
-                                    'mean_velocity': 'Mean Velocity'
-                                },
-                                color=merged_data['anomaly_3plus'].map({True: 'Anomaly', False: 'No Anomaly'}),
-                                color_discrete_map={'Anomaly': 'red', 'No Anomaly': 'green'},
-                                zoom=zoom_level)
+        fig = px.scatter_mapbox(
+            merged_data,
+            lat='latitude', lon='longitude',
+            hover_name='pid',
+            hover_data={'latitude': True, 'longitude': True, 'height': True, 'mean_velocity': True},
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'mean_velocity': 'Mean Velocity'},
+            color=merged_data['anomaly_3plus'].map({True: 'Anomaly', False: 'No Anomaly'}),
+            color_discrete_map={'Anomaly': 'red', 'No Anomaly': 'green'},
+            zoom=zoom_level
+        )
         fig.update_layout(legend_title_text='Anomaly Type')
+
     else:
         if color_mode == 'orbit':
-            fig = px.scatter_mapbox(filtered_data,
-                                    lat='latitude', lon='longitude',
-                                    hover_name='pid',
-                                    hover_data={
-                                        'latitude': True,
-                                        'longitude': True,
-                                        'height': True,
-                                        'mean_velocity': True
-                                    },
-                                    labels={
-                                        'latitude': 'Latitude',
-                                        'longitude': 'Longitude',
-                                        'height': 'Height',
-                                        'mean_velocity': 'Mean Velocity'
-                                    },
-                                    color='file',
-                                    zoom=zoom_level)
+            fig = px.scatter_mapbox(
+                filtered_data,
+                lat='latitude', lon='longitude',
+                hover_name='pid',
+                hover_data={'latitude': True, 'longitude': True, 'height': True, 'mean_velocity': True},
+                labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'mean_velocity': 'Mean Velocity'},
+                color='file',
+                zoom=zoom_level
+            )
             fig.update_layout(legend_title_text='Orbit Type')
 
         elif color_mode == 'speed':
-            fig = px.scatter_mapbox(filtered_data,
-                                    lat='latitude', lon='longitude',
-                                    hover_name='pid',
-                                    hover_data={
-                                        'latitude': True,
-                                        'longitude': True,
-                                        'height': True,
-                                        'mean_velocity': True
-                                    },
-                                    color='mean_velocity',
-                                    color_continuous_scale='Jet',
-                                    range_color=(-5, 5),
-                                    labels={
-                                        'latitude': 'Latitude',
-                                        'longitude': 'Longitude',
-                                        'height': 'Height',
-                                        'mean_velocity': 'Mean Velocity'
-                                    },
-                                    zoom=zoom_level)
+            fig = px.scatter_mapbox(
+                filtered_data,
+                lat='latitude', lon='longitude',
+                hover_name='pid',
+                hover_data={'latitude': True, 'longitude': True, 'height': True, 'mean_velocity': True},
+                color='mean_velocity',
+                color_continuous_scale='Jet',
+                range_color=(-5, 5),
+                labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'mean_velocity': 'Mean Velocity'},
+                zoom=zoom_level
+            )
             fig.update_layout(legend_title_text='Mean Velocity[mm/year]')
 
-    # Final Map Layout
-    fig.update_layout(mapbox_style=map_style, autosize=True, margin=dict(l=0, r=0, t=0, b=0),
-                      mapbox=dict(center=center_coords))
+    fig.update_layout(
+        mapbox_style=map_style,
+        autosize=True,
+        margin=dict(l=0, r=0, t=0, b=0),
+        mapbox=dict(center=center_coords)
+    )
+    
     return fig
 
 @app.callback(
@@ -450,14 +473,14 @@ def update_date_picker(selected_area):
      Input('date-range-picker', 'end_date'),
      Input('y-axis-min', 'value'),
      Input('y-axis-max', 'value'),
-     Input('area-dropdown', 'value')] 
+     Input('area-dropdown', 'value'),
+     Input('prediction-method-dropdown', 'value')] 
 )
-def display_displacement(clickData, start_date, end_date, y_min, y_max, selected_area):
+def display_displacement(clickData, start_date, end_date, y_min, y_max, selected_area, prediction_method):
     if clickData is None:
         return {}, {'display': 'none'}
 
     point_id = clickData['points'][0]['hovertext']
-
     start_date = pd.to_datetime(start_date)
     end_date = pd.to_datetime(end_date)
 
@@ -467,32 +490,42 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
         anomaly_data_99 = all_anomaly_data_99_wroclaw
         last_n_data = full_data.tail(60)
     else:
-        full_data = all_data_turow[all_data_turow['pid'] == point_id].copy()
-        anomaly_data_95 = anomaly_data_turow_95
-        anomaly_data_99 = anomaly_data_turow_99
-        last_n_data = full_data.tail(31) 
+        if prediction_method == 'autoencoder':
+            full_data = all_data_turow[all_data_turow['pid'] == point_id].copy()
+            anomaly_data_95 = anomaly_data_turow_95
+            anomaly_data_99 = anomaly_data_turow_99
+        elif prediction_method == 'lstm':
+            full_data = all_data_turow_lstm[all_data_turow_lstm['pid'] == point_id].copy()
+            anomaly_data_95 = anomaly_data_turow_95_lstm
+            anomaly_data_99 = anomaly_data_turow_99_lstm
+        last_n_data = full_data.tail(31)
 
     last_n_data.set_index('timestamp', inplace=True)
 
     filtered_data = full_data[(full_data['timestamp'] >= start_date) & (full_data['timestamp'] <= end_date)].copy()
 
+    if not last_n_data.empty and (last_n_data.index.min() <= end_date) and (last_n_data.index.max() >= start_date):
+        filtered_last_n_data = last_n_data[(last_n_data.index >= start_date) & (last_n_data.index <= end_date)].copy()
+    else:
+        filtered_last_n_data = pd.DataFrame()
+
     filtered_anomalies_95 = anomaly_data_95[anomaly_data_95['pid'] == point_id].copy()
     filtered_anomalies_99 = anomaly_data_99[anomaly_data_99['pid'] == point_id].copy()
 
     if not filtered_anomalies_95.empty:
-        filtered_anomalies_95 = filtered_anomalies_95.tail(len(last_n_data)).copy()
-        filtered_anomalies_95['timestamp'] = last_n_data.index.values[:len(filtered_anomalies_95)]
+        filtered_anomalies_95 = filtered_anomalies_95.tail(len(filtered_last_n_data)).copy()
+        filtered_anomalies_95['timestamp'] = filtered_last_n_data.index.values[:len(filtered_anomalies_95)]
         filtered_anomalies_95.set_index('timestamp', inplace=True)
-        last_n_data = last_n_data.join(
+        filtered_last_n_data = filtered_last_n_data.join(
             filtered_anomalies_95[['predicted_value', 'upper_bound', 'lower_bound', 'is_anomaly']], 
             how='left'
         )
 
     if not filtered_anomalies_99.empty:
-        filtered_anomalies_99 = filtered_anomalies_99.tail(len(last_n_data)).copy()
-        filtered_anomalies_99['timestamp'] = last_n_data.index.values[:len(filtered_anomalies_99)]
+        filtered_anomalies_99 = filtered_anomalies_99.tail(len(filtered_last_n_data)).copy()
+        filtered_anomalies_99['timestamp'] = filtered_last_n_data.index.values[:len(filtered_anomalies_99)]
         filtered_anomalies_99.set_index('timestamp', inplace=True)
-        last_n_data = last_n_data.join(
+        filtered_last_n_data = filtered_last_n_data.join(
             filtered_anomalies_99[['upper_bound', 'lower_bound', 'is_anomaly']], 
             how='left', rsuffix='_99'
         )
@@ -507,39 +540,39 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
                     name='InSAR measured displacement', 
                     line=dict(color='blue'))
 
-    if not last_n_data.empty:
-        if 'predicted_value' in last_n_data.columns:
-            fig.add_scatter(x=last_n_data.index, y=last_n_data['predicted_value'], 
+    if not filtered_last_n_data.empty:
+        if 'predicted_value' in filtered_last_n_data.columns:
+            fig.add_scatter(x=filtered_last_n_data.index, y=filtered_last_n_data['predicted_value'], 
                             mode='lines+markers', 
                             name='Predicted Displacement', 
                             line=dict(color='orange'))
 
-        fig.add_scatter(x=last_n_data.index, y=last_n_data['upper_bound'], 
+        fig.add_scatter(x=filtered_last_n_data.index, y=filtered_last_n_data['upper_bound'], 
                         mode='lines', line=dict(color='yellow', dash='dash'),
                         name='Upper Bound p=95')
 
-        fig.add_scatter(x=last_n_data.index, y=last_n_data['lower_bound'],
+        fig.add_scatter(x=filtered_last_n_data.index, y=filtered_last_n_data['lower_bound'],
                         mode='lines', line=dict(color='yellow', dash='dash'),
                         fill='tonexty', fillcolor='rgba(255, 252, 127, 0.2)',
                         name='Lower Bound p=95')
 
-        anomalies_95 = last_n_data[last_n_data['is_anomaly'] == 1]
+        anomalies_95 = filtered_last_n_data[filtered_last_n_data['is_anomaly'] == 1]
         if not anomalies_95.empty:
             fig.add_scatter(x=anomalies_95.index, y=anomalies_95['displacement'], 
                             mode='markers', name='Anomalies p=95', 
                             marker=dict(color='yellow', size=10))
 
-        if 'upper_bound_99' in last_n_data.columns:
-            fig.add_scatter(x=last_n_data.index, y=last_n_data['upper_bound_99'], 
+        if 'upper_bound_99' in filtered_last_n_data.columns:
+            fig.add_scatter(x=filtered_last_n_data.index, y=filtered_last_n_data['upper_bound_99'], 
                             mode='lines', line=dict(color='red', dash='dash'),
                             name='Upper Bound p=99')
 
-            fig.add_scatter(x=last_n_data.index, y=last_n_data['lower_bound_99'],
+            fig.add_scatter(x=filtered_last_n_data.index, y=filtered_last_n_data['lower_bound_99'],
                             mode='lines', line=dict(color='red', dash='dash'),
                             fill='tonexty', fillcolor='rgba(254, 121, 104, 0.1)',
                             name='Lower Bound p=99')
 
-            anomalies_99 = last_n_data[last_n_data['is_anomaly_99'] == 1]
+            anomalies_99 = filtered_last_n_data[filtered_last_n_data['is_anomaly_99'] == 1]
             if not anomalies_99.empty:
                 fig.add_scatter(x=anomalies_99.index, y=anomalies_99['displacement'], 
                                 mode='markers', name='Anomalies p=99', 
