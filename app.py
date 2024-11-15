@@ -240,6 +240,34 @@ app.layout = html.Div([
 
     html.Div(id='distance-output', style={'font-size': '16px', 'padding': '10px', 'color': 'black'}),
 
+    html.Div(id='custom-visualization-container', children=[
+        html.Label("Enable Prediction Visualization"),
+        dcc.Dropdown(
+            id='custom-visualization-dropdown',
+            options=[
+                {'label': 'Yes', 'value': 'yes'},
+                {'label': 'No', 'value': 'no'}
+            ],
+            value='no',
+            clearable=False,
+            style={'width': '100%'}
+        ),
+        html.Div(id='observation-slider-container', children=[
+            html.Label("Number of Observations"),
+            dcc.RangeSlider(
+                id='observation-slider',
+                min=1, max=60, 
+                step=1,
+                value=[1, 60], 
+                marks={i: str(i) for i in range(1, 61)}
+            )
+        ], style={'display': 'none'})  
+    ], style={'padding': '10px', 'margin-bottom': '10px'}),
+
+    html.Div(id='custom-displacement-container', children=[
+        dcc.Graph(id='custom-displacement-graph', style={'height': '50vh', 'width': '95vw'})
+    ], style={'display': 'none'}), 
+
     html.Div(id='prediction-method-container', children=[
         html.Label("Select Prediction Method"),
         dcc.Dropdown(
@@ -262,7 +290,7 @@ app.layout = html.Div([
             html.Label("Select Date Range", style={'font-size': '16px'}),
             dcc.DatePickerRange(
                 id='date-range-picker',
-                start_date=all_data_wroclaw['timestamp'].min(), 
+                start_date=all_data_wroclaw['timestamp'].min(),
                 end_date=all_data_wroclaw['timestamp'].max(),
                 display_format='YYYY-MM-DD',
                 style={'height': '5px', 'width': '300px', 'font-family': 'Arial', 'font-size': '4px', 'display': 'inline-block', 'padding': '5px'}
@@ -288,6 +316,81 @@ app.layout = html.Div([
         dcc.Graph(id='displacement-graph', style={'height': '50vh', 'width': '95vw'})
     ], style={'display': 'none'})
 ])
+
+@app.callback(
+    Output('observation-slider-container', 'style'),
+    Input('custom-visualization-dropdown', 'value')
+)
+def toggle_observation_slider(enable_custom_visualization):
+    if enable_custom_visualization == 'yes':
+        return {'display': 'block', 'padding': '10px'}
+    else:
+        return {'display': 'none'}
+
+@app.callback(
+    [Output('observation-slider', 'max'),
+     Output('observation-slider', 'marks'),
+     Output('observation-slider', 'value')],
+    Input('area-dropdown', 'value')
+)
+def update_observation_slider(selected_area):
+    if selected_area == 'wroclaw':
+        max_observations = 61
+    else:
+        max_observations = 31
+
+    marks = {i: str(i) for i in range(1, max_observations + 1)}
+    value = [1, max_observations] 
+    return max_observations, marks, value
+
+@app.callback(
+    [Output('custom-displacement-graph', 'figure'),
+     Output('custom-displacement-container', 'style')],
+    [Input('map', 'clickData'),
+     Input('observation-slider', 'value'),
+     Input('custom-visualization-dropdown', 'value'),
+     Input('area-dropdown', 'value')]
+)
+def display_custom_displacement(clickData, observation_range, custom_visualization, selected_area):
+    if custom_visualization != 'yes' or clickData is None:
+        return {}, {'display': 'none'}
+
+    point_id = clickData['points'][0]['hovertext']
+
+    if selected_area == 'wroclaw':
+        prediction_data = all_prediction_data_wroclaw
+    else:  
+        prediction_data = prediction_data_turow
+
+    point_data = prediction_data[prediction_data['pid'] == point_id].copy()
+    if point_data.empty:
+        return {}, {'display': 'none'}
+
+    start_idx, end_idx = observation_range
+    filtered_data = point_data.iloc[start_idx - 1:end_idx]
+
+    fig = px.scatter(
+        filtered_data,
+        x='step', y='predicted_displacement',
+        color='predicted_displacement',
+        color_continuous_scale='Jet',
+        labels={
+            'step': 'Observation Index',
+            'predicted_displacement': 'Range [mm]'
+        },
+        title=f"Predicted Displacement for Point {point_id}",
+    )
+
+    fig.update_traces(marker=dict(size=8))
+    fig.update_layout(
+        xaxis_title='Observation Index',
+        yaxis_title='Displacement LOS [mm]',
+        legend_title="Predicted Displacement [mm]",
+        margin=dict(l=0, r=0, t=50, b=0)
+    )
+
+    return fig, {'display': 'block'}
+
 
 @app.callback(
     Output('prediction-method-container', 'style'),
@@ -447,7 +550,6 @@ def display_distance(selected_points, distance_calc_enabled):
         ], style={'padding': '10px', 'border': '1px solid #ddd', 'border-radius': '5px'})
     else:
         return "Select two points on the map to calculate the distance."
-
 
 @app.callback(
     [Output('date-range-picker', 'start_date'),
