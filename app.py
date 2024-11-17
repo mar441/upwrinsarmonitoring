@@ -156,11 +156,11 @@ all_data_turow_lstm = pd.merge(all_data_turow_lstm, mean_velocity_data_turow_lst
 
 px.set_mapbox_access_token('pk.eyJ1IjoibWFycGllayIsImEiOiJjbTBxbXBsMGQwYjgyMmxzN3RpdmlhZDVrIn0.YWJh1RM6HKfN_pbH-jtJ6A')
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
 app.layout = html.Div([
     html.H3("Select Map and Data Visualization Options"),
-    
+
     html.Div([
         html.Div([
             html.Label("Map Style"),
@@ -186,7 +186,8 @@ app.layout = html.Div([
                 options=[
                     {'label': 'Orbit Type', 'value': 'orbit'},
                     {'label': 'Displacement Mean Velocity [mm/year]', 'value': 'speed'},
-                    {'label': 'Anomaly Type', 'value': 'anomaly_type'}
+                    {'label': 'Anomaly Type', 'value': 'anomaly_type'},
+                    {'label': 'Prediction Velocity', 'value': 'prediction_velocity'}
                 ],
                 value='orbit',
                 clearable=False,
@@ -222,7 +223,7 @@ app.layout = html.Div([
                 style={'width': '100%'}
             )
         ], style={'display': 'inline-block', 'width': '19%', 'padding': '10px'}),
-        
+
         html.Div([
             html.Label("Enable Distance Calculation"),
             dcc.Dropdown(
@@ -240,34 +241,6 @@ app.layout = html.Div([
 
     html.Div(id='distance-output', style={'font-size': '16px', 'padding': '10px', 'color': 'black'}),
 
-    html.Div(id='custom-visualization-container', children=[
-        html.Label("Enable Prediction Visualization"),
-        dcc.Dropdown(
-            id='custom-visualization-dropdown',
-            options=[
-                {'label': 'Yes', 'value': 'yes'},
-                {'label': 'No', 'value': 'no'}
-            ],
-            value='no',
-            clearable=False,
-            style={'width': '100%'}
-        ),
-        html.Div(id='observation-slider-container', children=[
-            html.Label("Number of Observations"),
-            dcc.RangeSlider(
-                id='observation-slider',
-                min=1, max=60, 
-                step=1,
-                value=[1, 60], 
-                marks={i: str(i) for i in range(1, 61)}
-            )
-        ], style={'display': 'none'})  
-    ], style={'padding': '10px', 'margin-bottom': '10px'}),
-
-    html.Div(id='custom-displacement-container', children=[
-        dcc.Graph(id='custom-displacement-graph', style={'height': '50vh', 'width': '95vw'})
-    ], style={'display': 'none'}), 
-
     html.Div(id='prediction-method-container', children=[
         html.Label("Select Prediction Method"),
         dcc.Dropdown(
@@ -282,11 +255,25 @@ app.layout = html.Div([
         )
     ], style={'display': 'none', 'padding': '10px'}),
 
+    html.Div([
+        html.Label("Select Observation Range"),
+        dcc.RangeSlider(
+            id='prediction-range-slider',
+            min=1,
+            max=61, 
+            step=1,
+            marks={i: str(i) for i in range(1, 62)},
+            value=[1, 60],  
+            tooltip={"placement": "bottom", "always_visible": True},
+            allowCross=False  
+        )
+    ], id='prediction-slider-container', style={'padding': '10px'}),  
+
     dcc.Graph(id='map', style={'height': '80vh', 'width': '95vw'}, config={'scrollZoom': True}),
     dcc.Store(id='selected-points', data={'point_1': None, 'point_2': None}),
 
     html.Div(id='displacement-container', children=[
-        html.Div([
+        html.Div([ 
             html.Label("Select Date Range", style={'font-size': '16px'}),
             dcc.DatePickerRange(
                 id='date-range-picker',
@@ -297,7 +284,7 @@ app.layout = html.Div([
             )
         ], style={'display': 'inline-block', 'padding': '10px'}),
 
-        html.Div([
+        html.Div([ 
             html.Label("Set Y-Axis Range (mm)"),
             dcc.Input(
                 id='y-axis-min',
@@ -318,79 +305,14 @@ app.layout = html.Div([
 ])
 
 @app.callback(
-    Output('observation-slider-container', 'style'),
-    Input('custom-visualization-dropdown', 'value')
+    Output('prediction-slider-container', 'style'),
+    [Input('color-mode-dropdown', 'value')]
 )
-def toggle_observation_slider(enable_custom_visualization):
-    if enable_custom_visualization == 'yes':
+def toggle_prediction_slider_visibility(color_mode):
+    if color_mode == 'prediction_velocity': 
         return {'display': 'block', 'padding': '10px'}
     else:
-        return {'display': 'none'}
-
-@app.callback(
-    [Output('observation-slider', 'max'),
-     Output('observation-slider', 'marks'),
-     Output('observation-slider', 'value')],
-    Input('area-dropdown', 'value')
-)
-def update_observation_slider(selected_area):
-    if selected_area == 'wroclaw':
-        max_observations = 61
-    else:
-        max_observations = 31
-
-    marks = {i: str(i) for i in range(1, max_observations + 1)}
-    value = [1, max_observations] 
-    return max_observations, marks, value
-
-@app.callback(
-    [Output('custom-displacement-graph', 'figure'),
-     Output('custom-displacement-container', 'style')],
-    [Input('map', 'clickData'),
-     Input('observation-slider', 'value'),
-     Input('custom-visualization-dropdown', 'value'),
-     Input('area-dropdown', 'value')]
-)
-def display_custom_displacement(clickData, observation_range, custom_visualization, selected_area):
-    if custom_visualization != 'yes' or clickData is None:
-        return {}, {'display': 'none'}
-
-    point_id = clickData['points'][0]['hovertext']
-
-    if selected_area == 'wroclaw':
-        prediction_data = all_prediction_data_wroclaw
-    else:  
-        prediction_data = prediction_data_turow
-
-    point_data = prediction_data[prediction_data['pid'] == point_id].copy()
-    if point_data.empty:
-        return {}, {'display': 'none'}
-
-    start_idx, end_idx = observation_range
-    filtered_data = point_data.iloc[start_idx - 1:end_idx]
-
-    fig = px.scatter(
-        filtered_data,
-        x='step', y='predicted_displacement',
-        color='predicted_displacement',
-        color_continuous_scale='Jet',
-        labels={
-            'step': 'Observation Index',
-            'predicted_displacement': 'Range [mm]'
-        },
-        title=f"Predicted Displacement for Point {point_id}",
-    )
-
-    fig.update_traces(marker=dict(size=8))
-    fig.update_layout(
-        xaxis_title='Observation Index',
-        yaxis_title='Displacement LOS [mm]',
-        legend_title="Predicted Displacement [mm]",
-        margin=dict(l=0, r=0, t=50, b=0)
-    )
-
-    return fig, {'display': 'block'}
-
+        return {'display': 'none', 'padding': '10px'}
 
 @app.callback(
     Output('prediction-method-container', 'style'),
@@ -417,33 +339,63 @@ def update_orbit_filter(selected_area):
 
 @app.callback(
     Output('map', 'figure'),
-    [Input('map-style-dropdown', 'value'),
-     Input('color-mode-dropdown', 'value'),
-     Input('orbit-filter-dropdown', 'value'),
-     Input('area-dropdown', 'value')]
+    [
+        Input('map-style-dropdown', 'value'),
+        Input('color-mode-dropdown', 'value'),
+        Input('orbit-filter-dropdown', 'value'),
+        Input('area-dropdown', 'value'),
+        Input('prediction-range-slider', 'value')  
+    ]
 )
-def update_map(map_style, color_mode, orbit_filter, selected_area):
+def update_map(map_style, color_mode, orbit_filter, selected_area, prediction_range):
     if selected_area == 'wroclaw':
         data = all_data_wroclaw.drop_duplicates(subset=['pid'])
         center_coords = {'lat': all_data_wroclaw['latitude'].mean(), 'lon': all_data_wroclaw['longitude'].mean()}
-        zoom_level = 14 
+        zoom_level = 14
     elif selected_area == 'turow':
         data = all_data_turow.drop_duplicates(subset=['pid'])
         center_coords = {'lat': 50.90803234267631, 'lon': 14.898742567091745}
-        zoom_level = 12 
-        orbit_filter = ['Ascending 73'] 
+        zoom_level = 12
+        orbit_filter = ['Ascending 73']  
 
     if isinstance(orbit_filter, str):
         orbit_filter = [orbit_filter]
 
     filtered_data = data[data['file'].isin(orbit_filter)]
+    filtered_data = filtered_data.copy() 
     filtered_data.loc[:, 'mean_velocity'] = filtered_data['mean_velocity'].round(1)
 
-    if color_mode == 'anomaly_type':
+    if selected_area == 'wroclaw':
+        prediction_data = all_prediction_data_wroclaw
+    elif selected_area == 'turow':
+        prediction_data = prediction_data_turow
+
+    merged_data = pd.merge(filtered_data, prediction_data[['pid', 'predicted_displacement', 'step']], on='pid', how='left')
+
+    if color_mode == 'prediction_velocity':  
+        merged_data['prediction_velocity'] = merged_data.apply(
+            lambda row: row['predicted_displacement'] * (prediction_range[1] - prediction_range[0]),
+            axis=1
+        )
+
+        fig = px.scatter_mapbox(
+            merged_data,
+            lat='latitude', lon='longitude',
+            hover_name='pid',
+            hover_data={'latitude': True, 'longitude': True, 'height': True, 'predicted_displacement': True},
+            color='prediction_velocity',  
+            color_continuous_scale='Jet',
+            range_color=(-5, 5),  
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'predicted_displacement': 'Predicted Displacement'},
+            zoom=zoom_level
+        )
+        fig.update_layout(legend_title_text='Prediction Velocity')
+
+    elif color_mode == 'anomaly_type':
         if selected_area == 'wroclaw':
-            merged_data = filtered_data.merge(all_anomaly_data_99_wroclaw[['pid', 'is_anomaly']], on='pid', how='left')
+            merged_data = merged_data.merge(all_anomaly_data_99_wroclaw[['pid', 'is_anomaly']], on='pid', how='left')
         else:
-            merged_data = filtered_data.merge(anomaly_data_turow_99[['pid', 'is_anomaly']], on='pid', how='left')
+            merged_data = merged_data.merge(anomaly_data_turow_99[['pid', 'is_anomaly']], on='pid', how='left')
 
         merged_data['is_anomaly'] = merged_data['is_anomaly'].fillna(False).astype(bool)
         merged_data['consecutive_anomalies'] = (
@@ -456,40 +408,39 @@ def update_map(map_style, color_mode, orbit_filter, selected_area):
             merged_data,
             lat='latitude', lon='longitude',
             hover_name='pid',
-            hover_data={'latitude': True, 'longitude': True, 'height': True, 'mean_velocity': True},
-            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'mean_velocity': 'Mean Velocity'},
+            hover_data={'latitude': True, 'longitude': True, 'height': True, 'predicted_displacement': True},
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'predicted_displacement': 'Predicted Displacement'},
             color=merged_data['anomaly_3plus'].map({True: 'Anomaly', False: 'No Anomaly'}),
             color_discrete_map={'Anomaly': 'red', 'No Anomaly': 'green'},
             zoom=zoom_level
         )
         fig.update_layout(legend_title_text='Anomaly Type')
 
-    else:
-        if color_mode == 'orbit':
-            fig = px.scatter_mapbox(
-                filtered_data,
-                lat='latitude', lon='longitude',
-                hover_name='pid',
-                hover_data={'latitude': True, 'longitude': True, 'height': True, 'mean_velocity': True},
-                labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'mean_velocity': 'Mean Velocity'},
-                color='file',
-                zoom=zoom_level
-            )
-            fig.update_layout(legend_title_text='Orbit Type')
+    elif color_mode == 'orbit':
+        fig = px.scatter_mapbox(
+            merged_data,
+            lat='latitude', lon='longitude',
+            hover_name='pid',
+            hover_data={'latitude': True, 'longitude': True, 'height': True, 'predicted_displacement': True},
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'predicted_displacement': 'Predicted Displacement'},
+            color='file',
+            zoom=zoom_level
+        )
+        fig.update_layout(legend_title_text='Orbit Type')
 
-        elif color_mode == 'speed':
-            fig = px.scatter_mapbox(
-                filtered_data,
-                lat='latitude', lon='longitude',
-                hover_name='pid',
-                hover_data={'latitude': True, 'longitude': True, 'height': True, 'mean_velocity': True},
-                color='mean_velocity',
-                color_continuous_scale='Jet',
-                range_color=(-5, 5),
-                labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'mean_velocity': 'Mean Velocity'},
-                zoom=zoom_level
-            )
-            fig.update_layout(legend_title_text='Mean Velocity[mm/year]')
+    elif color_mode == 'speed':
+        fig = px.scatter_mapbox(
+            merged_data,
+            lat='latitude', lon='longitude',
+            hover_name='pid',
+            hover_data={'latitude': True, 'longitude': True, 'height': True, 'predicted_displacement': True},
+            color='predicted_displacement',
+            color_continuous_scale='Jet',
+            range_color=(-5, 5),
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'predicted_displacement': 'Predicted Displacement'},
+            zoom=zoom_level
+        )
+        fig.update_layout(legend_title_text='Predicted Displacement')
 
     fig.update_layout(
         mapbox_style=map_style,
@@ -497,7 +448,7 @@ def update_map(map_style, color_mode, orbit_filter, selected_area):
         margin=dict(l=0, r=0, t=0, b=0),
         mapbox=dict(center=center_coords)
     )
-    
+
     return fig
 
 @app.callback(
@@ -550,7 +501,7 @@ def display_distance(selected_points, distance_calc_enabled):
         ], style={'padding': '10px', 'border': '1px solid #ddd', 'border-radius': '5px'})
     else:
         return "Select two points on the map to calculate the distance."
-
+    
 @app.callback(
     [Output('date-range-picker', 'start_date'),
      Output('date-range-picker', 'end_date'),
