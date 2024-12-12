@@ -39,6 +39,12 @@ geo_data_turow['pid'] = geo_data_turow['pid'].astype(str).str.strip()
 geo_data_turow_lstm = pd.read_csv('tr_geo_lstm.csv')
 geo_data_turow_lstm['pid'] = geo_data_turow_lstm['pid'].astype(str).str.strip()
 
+geo_data_bedzin = pd.read_csv('bedzin_geo.csv', delimiter=';')
+geo_data_bedzin['pid'] = geo_data_bedzin['pid'].astype(str).str.strip()
+
+geo_data_grunwald = pd.read_csv('grunwald_geo.csv', delimiter=';')
+geo_data_grunwald['pid'] = geo_data_grunwald['pid'].astype(str).str.strip()
+
 displacement_data_1 = load_displacement_data('mz2_10.csv', 'Descending 175')
 displacement_data_2 = load_displacement_data('mz4_3.csv', 'Ascending 124')
 displacement_data_3 = load_displacement_data('msz4_3.csv', 'Descending 175')
@@ -63,6 +69,14 @@ all_data_turow = pd.merge(displacement_data_5, geo_data_turow, on='pid', how='le
 displacement_data_turow_lstm = load_displacement_data('tr_73_lstm.csv', 'Ascending 73 LSTM')
 displacement_data_turow_lstm['pid'] = displacement_data_turow_lstm['pid'].astype(str).str.strip() 
 all_data_turow_lstm = pd.merge(displacement_data_turow_lstm, geo_data_turow_lstm, on='pid', how='left')
+
+displacement_data_bedzin = load_displacement_data('bedzin_displ.csv', 'Ascending 124')
+displacement_data_bedzin['pid'] = displacement_data_bedzin['pid'].astype(str).str.strip() 
+all_data_bedzin = pd.merge(displacement_data_bedzin, geo_data_bedzin, on='pid', how='left')
+
+displacement_data_grunwald = load_displacement_data('grunwald_displ.csv', 'Ascending 124')
+displacement_data_grunwald['pid'] = displacement_data_grunwald['pid'].astype(str).str.strip() 
+all_data_grunwald = pd.merge(displacement_data_grunwald, geo_data_grunwald, on='pid', how='left')
 
 prediction_data_1 = pd.read_csv('predictions_values.csv')
 prediction_data_1 = prediction_data_1.melt(var_name='pid', 
@@ -101,6 +115,16 @@ prediction_data_turow_lstm = prediction_data_turow_lstm.melt(var_name='pid', val
 prediction_data_turow_lstm['label'] = 'LSTM Prediction Set'
 prediction_data_turow_lstm['step'] = prediction_data_turow_lstm.groupby('pid').cumcount()
 
+prediction_data_bedzin = pd.read_csv('predictions_bedzin.csv', delimiter=',')
+prediction_data_bedzin = prediction_data_bedzin.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_bedzin['label'] = 'Bedzin Prediction Set'
+prediction_data_bedzin['step'] = prediction_data_bedzin.groupby('pid').cumcount()
+
+prediction_data_grunwald = pd.read_csv('predictions_grunwald.csv', delimiter=',')
+prediction_data_grunwald = prediction_data_grunwald.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_grunwald['label'] = 'Grunwald Prediction Set'
+prediction_data_grunwald['step'] = prediction_data_grunwald.groupby('pid').cumcount()
+
 anomaly_data_1_95 = load_anomaly_data('anomaly_output_95.csv', 'Anomaly Set 1 (95%)')
 anomaly_data_2_95 = load_anomaly_data('anomaly_output2_95.csv', 'Anomaly Set 2 (95%)')
 anomaly_data_3_95 = load_anomaly_data('anomaly_output3_95.csv', 'Anomaly Set 3 (95%)')
@@ -127,32 +151,125 @@ anomaly_data_turow_95_lstm = anomaly_data_turow_95_lstm.groupby('pid').head(31)
 anomaly_data_turow_99_lstm = load_anomaly_data('anomaly_lstm_99.csv', 'Anomaly Set 5 LSTM (99%)')
 anomaly_data_turow_99_lstm = anomaly_data_turow_99_lstm.groupby('pid').head(31)
 
-all_data_wroclaw.sort_values(by=['pid', 'timestamp'], inplace=True)
-all_data_wroclaw['displacement_diff'] = all_data_wroclaw.groupby('pid')['displacement'].diff()
-all_data_wroclaw['time_diff'] = all_data_wroclaw.groupby('pid')['timestamp'].diff().dt.days
-all_data_wroclaw['displacement_speed'] = (all_data_wroclaw['displacement_diff'] / all_data_wroclaw['time_diff']) * 365
+anomaly_data_bedzin_95 = load_anomaly_data('anomaly_bedzin_95.csv', 'Anomaly Set 6 LSTM (95%)')
+anomaly_data_bedzin_95 = anomaly_data_bedzin_95.groupby('pid').head(11)
 
-mean_velocity_data_wroclaw = all_data_wroclaw.groupby('pid')['displacement_speed'].mean().reset_index()
+anomaly_data_bedzin_99 = load_anomaly_data('anomaly_bedzin_99.csv', 'Anomaly Set 6 LSTM (99%)')
+anomaly_data_bedzin_99 = anomaly_data_bedzin_99.groupby('pid').head(11)
+
+anomaly_data_grunwald_95 = load_anomaly_data('anomaly_grunwald_95.csv', 'Anomaly Set 6 LSTM (95%)')
+anomaly_data_grunwald_95 = anomaly_data_grunwald_95.groupby('pid').head(61)
+
+anomaly_data_grunwald_99 = load_anomaly_data('anomaly_grunwald_99.csv', 'Anomaly Set 6 LSTM (99%)')
+anomaly_data_grunwald_99 = anomaly_data_grunwald_99.groupby('pid').head(61)
+
+all_data_wroclaw.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_wroclaw['displacement_diff'] = all_data_wroclaw.groupby('pid')['displacement'].diff().round(1)
+all_data_wroclaw['time_diff'] = all_data_wroclaw.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_wroclaw['displacement_speed'] = ((all_data_wroclaw['displacement_diff'] / all_data_wroclaw['time_diff']) * 365).round(1)
+
+mean_velocity_data_wroclaw = all_data_wroclaw.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
 mean_velocity_data_wroclaw.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
 all_data_wroclaw = pd.merge(all_data_wroclaw, mean_velocity_data_wroclaw, on='pid', how='left')
 
 all_data_turow.sort_values(by=['pid', 'timestamp'], inplace=True)
-all_data_turow['displacement_diff'] = all_data_turow.groupby('pid')['displacement'].diff()
-all_data_turow['time_diff'] = all_data_turow.groupby('pid')['timestamp'].diff().dt.days
-all_data_turow['displacement_speed'] = (all_data_turow['displacement_diff'] / all_data_turow['time_diff']) * 365
+all_data_turow['displacement_diff'] = all_data_turow.groupby('pid')['displacement'].diff().round(1)
+all_data_turow['time_diff'] = all_data_turow.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_turow['displacement_speed'] = ((all_data_turow['displacement_diff'] / all_data_turow['time_diff']) * 365).round(1)
 
-mean_velocity_data_turow = all_data_turow.groupby('pid')['displacement_speed'].mean().reset_index()
+mean_velocity_data_turow = all_data_turow.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
 mean_velocity_data_turow.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
 all_data_turow = pd.merge(all_data_turow, mean_velocity_data_turow, on='pid', how='left')
 
 all_data_turow_lstm.sort_values(by=['pid', 'timestamp'], inplace=True)
-all_data_turow_lstm['displacement_diff'] = all_data_turow_lstm.groupby('pid')['displacement'].diff()
-all_data_turow_lstm['time_diff'] = all_data_turow_lstm.groupby('pid')['timestamp'].diff().dt.days
-all_data_turow_lstm['displacement_speed'] = (all_data_turow_lstm['displacement_diff'] / all_data_turow_lstm['time_diff']) * 365
+all_data_turow_lstm['displacement_diff'] = all_data_turow_lstm.groupby('pid')['displacement'].diff().round(1)
+all_data_turow_lstm['time_diff'] = all_data_turow_lstm.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_turow_lstm['displacement_speed'] = ((all_data_turow_lstm['displacement_diff'] / all_data_turow_lstm['time_diff']) * 365).round(1)
 
-mean_velocity_data_turow_lstm = all_data_turow_lstm.groupby('pid')['displacement_speed'].mean().reset_index()
+mean_velocity_data_turow_lstm = all_data_turow_lstm.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
 mean_velocity_data_turow_lstm.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
 all_data_turow_lstm = pd.merge(all_data_turow_lstm, mean_velocity_data_turow_lstm, on='pid', how='left')
+
+all_data_bedzin.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_bedzin['displacement_diff'] = all_data_bedzin.groupby('pid')['displacement'].diff().round(1)
+all_data_bedzin['time_diff'] = all_data_bedzin.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_bedzin['displacement_speed'] = ((all_data_bedzin['displacement_diff'] / all_data_bedzin['time_diff']) * 365).round(1)
+
+mean_velocity_data_bedzin = all_data_bedzin.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_bedzin.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_bedzin = pd.merge(all_data_bedzin, mean_velocity_data_bedzin, on='pid', how='left')
+
+all_data_grunwald.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_grunwald['displacement_diff'] = all_data_grunwald.groupby('pid')['displacement'].diff().round(1)
+all_data_grunwald['time_diff'] = all_data_grunwald.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_grunwald['displacement_speed'] = ((all_data_grunwald['displacement_diff'] / all_data_grunwald['time_diff']) * 365).round(1)
+
+mean_velocity_data_grunwald = all_data_grunwald.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_grunwald.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_grunwald = pd.merge(all_data_grunwald, mean_velocity_data_grunwald, on='pid', how='left')
+
+def compute_prefix_sums(data):
+    data = data.sort_values(by=['pid', 'step'])
+    pivot = data.pivot(index='pid', columns='step', values='predicted_displacement').fillna(0).round(1)
+    pivot[0] = 0
+    pivot = pivot.sort_index(axis=1)
+    for col in pivot.columns[1:]:
+        pivot[col] = (pivot[col] + pivot[col-1]).round(1)
+    return pivot
+
+wroclaw_prefix = compute_prefix_sums(all_prediction_data_wroclaw)
+turow_prefix = compute_prefix_sums(prediction_data_turow)
+turow_lstm_prefix = compute_prefix_sums(prediction_data_turow_lstm)
+bedzin_prefix = compute_prefix_sums(prediction_data_bedzin)
+grunwald_prefix = compute_prefix_sums(prediction_data_grunwald)
+
+prefix_data = {
+    ('wroclaw', 'autoencoder'): wroclaw_prefix,
+    ('turow', 'autoencoder'): turow_prefix,
+    ('turow', 'lstm'): turow_lstm_prefix,
+    ('bedzin', 'autoencoder'): bedzin_prefix,
+    ('grunwald', 'autoencoder'): grunwald_prefix,
+}
+
+MAX_WROCLAW = wroclaw_prefix.columns.max()
+MAX_TUROW = turow_prefix.columns.max()
+MAX_BEDZIN = bedzin_prefix.columns.max()
+MAX_GRUNWALD = grunwald_prefix.columns.max()
+
+def add_obs_step(df):
+    df = df.sort_values(by=['pid', 'timestamp'])
+    df['obs_step'] = df.groupby('pid').cumcount() + 1
+    return df
+
+all_data_wroclaw = add_obs_step(all_data_wroclaw)
+all_data_turow = add_obs_step(all_data_turow)
+all_data_bedzin = add_obs_step(all_data_bedzin)
+all_data_grunwald = add_obs_step(all_data_grunwald)
+
+def compute_prefix_sums_actual(df):
+    pivot = df.pivot(index='pid', columns='obs_step', values='displacement').fillna(0).round(1)
+    pivot[0] = 0
+    pivot = pivot.sort_index(axis=1)
+    for col in pivot.columns[1:]:
+        pivot[col] = (pivot[col] + pivot[col-1]).round(1)
+    return pivot
+
+actual_wroclaw_prefix = compute_prefix_sums_actual(all_data_wroclaw)
+actual_turow_prefix = compute_prefix_sums_actual(all_data_turow)
+actual_bedzin_prefix = compute_prefix_sums_actual(all_data_bedzin)
+actual_grunwald_prefix = compute_prefix_sums_actual(all_data_grunwald)
+
+actual_prefix_data = {
+    'wroclaw': actual_wroclaw_prefix,
+    'turow': actual_turow_prefix,
+    'bedzin': actual_bedzin_prefix,
+    'grunwald': actual_grunwald_prefix,
+}
+
+MAX_ACTUAL_WROCLAW = actual_wroclaw_prefix.columns.max()
+MAX_ACTUAL_TUROW = actual_turow_prefix.columns.max()
+MAX_ACTUAL_BEDZIN = actual_bedzin_prefix.columns.max()
+MAX_ACTUAL_GRUNWALD = actual_grunwald_prefix.columns.max()
 
 px.set_mapbox_access_token('pk.eyJ1IjoibWFycGllayIsImEiOiJjbTBxbXBsMGQwYjgyMmxzN3RpdmlhZDVrIn0.YWJh1RM6HKfN_pbH-jtJ6A')
 
@@ -187,7 +304,8 @@ app.layout = html.Div([
                     {'label': 'Orbit Type', 'value': 'orbit'},
                     {'label': 'Displacement Mean Velocity [mm/year]', 'value': 'speed'},
                     {'label': 'Anomaly Type', 'value': 'anomaly_type'},
-                    {'label': 'Prediction Velocity', 'value': 'prediction_velocity'}
+                    {'label': 'Prediction Velocity', 'value': 'prediction_velocity'},
+                    {'label': 'Actual Displacement Velocity', 'value': 'actual_displacement_velocity'}
                 ],
                 value='orbit',
                 clearable=False,
@@ -215,8 +333,10 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='area-dropdown',
                 options=[
-                    {'label': 'Wrocław', 'value': 'wroclaw'},
-                    {'label': 'Turów', 'value': 'turow'}
+                    {'label': 'Mosty - Wrocław', 'value': 'wroclaw'},
+                    {'label': 'Turów', 'value': 'turow'},
+                    {'label': 'Plac Grunwaldzki - Wrocław', 'value': 'grunwald'},
+                    {'label': 'Będzin', 'value': 'bedzin'}
                 ],
                 value='wroclaw',
                 clearable=False,
@@ -258,16 +378,16 @@ app.layout = html.Div([
     html.Div([
         html.Label("Select Observation Range"),
         dcc.RangeSlider(
-            id='prediction-range-slider',
+            id='dynamic-prediction-range-slider',
             min=1,
-            max=61, 
+            max=60,
             step=1,
-            marks={i: str(i) for i in range(1, 62)},
-            value=[1, 60],  
+            marks={i: str(i) for i in range(1, 61)},
+            value=[1, 5],
             tooltip={"placement": "bottom", "always_visible": True},
             allowCross=False  
         )
-    ], id='prediction-slider-container', style={'padding': '10px'}),  
+    ], id='prediction-slider-container', style={'display': 'none', 'padding': '10px'}),  
 
     dcc.Graph(id='map', style={'height': '80vh', 'width': '95vw'}, config={'scrollZoom': True}),
     dcc.Store(id='selected-points', data={'point_1': None, 'point_2': None}),
@@ -309,7 +429,7 @@ app.layout = html.Div([
     [Input('color-mode-dropdown', 'value')]
 )
 def toggle_prediction_slider_visibility(color_mode):
-    if color_mode == 'prediction_velocity': 
+    if color_mode in ['prediction_velocity', 'actual_displacement_velocity']: 
         return {'display': 'block', 'padding': '10px'}
     else:
         return {'display': 'none', 'padding': '10px'}
@@ -333,9 +453,47 @@ def toggle_prediction_method_dropdown(selected_area):
 def update_orbit_filter(selected_area):
     if selected_area == 'turow':
         return [{'label': 'Ascending 73', 'value': 'Ascending 73'}], 'Ascending 73', True
+    elif selected_area == 'bedzin':
+        return [{'label': 'Ascending 124', 'value': 'Ascending 124'}], 'Ascending 124', True
+    elif selected_area == 'grunwald':
+        return [{'label': 'Ascending 124', 'value': 'Ascending 124'}], 'Ascending 124', True
     else:
         return [{'label': 'Ascending 124', 'value': 'Ascending 124'}, 
                 {'label': 'Descending 175', 'value': 'Descending 175'}], 'Ascending 124', False
+
+@app.callback(
+    [Output('dynamic-prediction-range-slider', 'max'),
+     Output('dynamic-prediction-range-slider', 'marks'),
+     Output('dynamic-prediction-range-slider', 'value')],
+    [Input('area-dropdown', 'value'),
+     Input('color-mode-dropdown', 'value'),
+     Input('prediction-method-dropdown', 'value')]
+)
+def update_slider_max(selected_area, color_mode, prediction_method):
+    if color_mode == 'prediction_velocity':
+        if selected_area == 'turow':
+            max_val = MAX_TUROW
+        elif selected_area == 'bedzin':
+            max_val = MAX_BEDZIN
+        elif selected_area == 'grunwald':
+            max_val = MAX_GRUNWALD
+        else:
+            max_val = MAX_WROCLAW
+    elif color_mode == 'actual_displacement_velocity':
+        if selected_area == 'turow':
+            max_val = MAX_ACTUAL_TUROW
+        elif selected_area == 'bedzin':
+            max_val = MAX_ACTUAL_BEDZIN
+        elif selected_area == 'grunwald':
+            max_val = MAX_ACTUAL_GRUNWALD
+        else:
+            max_val = MAX_ACTUAL_WROCLAW
+    else:
+        max_val = 60
+
+    marks = {i: str(i) for i in range(1, max_val+1)}
+    default_end = min(5, max_val)
+    return max_val, marks, [1, default_end]
 
 @app.callback(
     Output('map', 'figure'),
@@ -344,10 +502,11 @@ def update_orbit_filter(selected_area):
         Input('color-mode-dropdown', 'value'),
         Input('orbit-filter-dropdown', 'value'),
         Input('area-dropdown', 'value'),
-        Input('prediction-range-slider', 'value')  
+        Input('dynamic-prediction-range-slider', 'value'),
+        Input('prediction-method-dropdown', 'value')
     ]
 )
-def update_map(map_style, color_mode, orbit_filter, selected_area, prediction_range):
+def update_map(map_style, color_mode, orbit_filter, selected_area, pred_range, prediction_method):
     if selected_area == 'wroclaw':
         data = all_data_wroclaw.drop_duplicates(subset=['pid'])
         center_coords = {'lat': all_data_wroclaw['latitude'].mean(), 'lon': all_data_wroclaw['longitude'].mean()}
@@ -356,46 +515,110 @@ def update_map(map_style, color_mode, orbit_filter, selected_area, prediction_ra
         data = all_data_turow.drop_duplicates(subset=['pid'])
         center_coords = {'lat': 50.90803234267631, 'lon': 14.898742567091745}
         zoom_level = 12
-        orbit_filter = ['Ascending 73']  
+        orbit_filter = ['Ascending 73']
+    elif selected_area == 'grunwald':
+        data = all_data_grunwald.drop_duplicates(subset=['pid'])
+        center_coords = {'lat': 51.11249671461431, 'lon': 17.06133312265709}
+        zoom_level = 14
+        orbit_filter = ['Ascending 124']
+    else:
+        data = all_data_bedzin.drop_duplicates(subset=['pid'])
+        center_coords = {'lat': 50.32131449, 'lon': 19.1212986}
+        zoom_level = 14
+        orbit_filter = ['Ascending 124']
 
     if isinstance(orbit_filter, str):
         orbit_filter = [orbit_filter]
 
-    filtered_data = data[data['file'].isin(orbit_filter)]
-    filtered_data = filtered_data.copy() 
+    filtered_data = data[data['file'].isin(orbit_filter)].copy()
     filtered_data.loc[:, 'mean_velocity'] = filtered_data['mean_velocity'].round(1)
 
-    if selected_area == 'wroclaw':
-        prediction_data = all_prediction_data_wroclaw
-    elif selected_area == 'turow':
-        prediction_data = prediction_data_turow
+    start_val, end_val = pred_range
 
-    merged_data = pd.merge(filtered_data, prediction_data[['pid', 'predicted_displacement', 'step']], on='pid', how='left')
+    if color_mode == 'prediction_velocity':
+        if selected_area == 'turow':
+            max_steps = MAX_TUROW
+        elif selected_area == 'bedzin':
+            max_steps = MAX_BEDZIN
+        elif selected_area == 'grunwald':
+            max_steps = MAX_GRUNWALD
+        else:
+            max_steps = MAX_WROCLAW
 
-    if color_mode == 'prediction_velocity':  
-        merged_data['prediction_velocity'] = merged_data.apply(
-            lambda row: row['predicted_displacement'] * (prediction_range[1] - prediction_range[0]),
-            axis=1
-        )
+        pred_key = (selected_area, prediction_method if selected_area == 'turow' else 'autoencoder')
+        prefix_pivot = prefix_data[pred_key]
+
+        end_val = min(end_val, max_steps)
+        start_val = min(start_val, max_steps)
+
+        numerator = prefix_pivot[end_val] - prefix_pivot[start_val-1]
+        denominator = (end_val - start_val + 1)
+        prediction_avg = numerator / denominator
+
+        merged_data = filtered_data.set_index('pid')
+        merged_data['prediction_velocity'] = prediction_avg
+        merged_data.reset_index(inplace=True)
 
         fig = px.scatter_mapbox(
             merged_data,
             lat='latitude', lon='longitude',
             hover_name='pid',
-            hover_data={'latitude': True, 'longitude': True, 'height': True, 'predicted_displacement': True},
+            hover_data={'latitude': True, 'longitude': True, 'height': True},
             color='prediction_velocity',  
             color_continuous_scale='Jet',
-            range_color=(-5, 5),  
-            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'predicted_displacement': 'Predicted Displacement'},
+            range_color=(-5, 5),
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height'},
             zoom=zoom_level
         )
-        fig.update_layout(legend_title_text='Prediction Velocity')
+        fig.update_layout(legend_title_text='Prediction Velocity Average')
+
+    elif color_mode == 'actual_displacement_velocity':
+        if selected_area == 'turow':
+            max_steps = MAX_ACTUAL_TUROW
+            prefix_pivot = actual_prefix_data['turow']
+        elif selected_area == 'bedzin':
+            max_steps = MAX_ACTUAL_BEDZIN
+            prefix_pivot = actual_prefix_data['bedzin']
+        elif selected_area == 'grunwald':
+            max_steps = MAX_ACTUAL_GRUNWALD
+            prefix_pivot = actual_prefix_data['grunwald']
+        else:
+            max_steps = MAX_ACTUAL_WROCLAW
+            prefix_pivot = actual_prefix_data['wroclaw']
+
+        end_val = min(end_val, max_steps)
+        start_val = min(start_val, max_steps)
+
+        numerator = prefix_pivot[end_val] - prefix_pivot[start_val-1]
+        denominator = (end_val - start_val + 1)
+        actual_avg = numerator / denominator
+
+        merged_data = filtered_data.set_index('pid')
+        merged_data['actual_displacement_velocity'] = actual_avg
+        merged_data.reset_index(inplace=True)
+
+        fig = px.scatter_mapbox(
+            merged_data,
+            lat='latitude', lon='longitude',
+            hover_name='pid',
+            hover_data={'latitude': True, 'longitude': True, 'height': True},
+            color='actual_displacement_velocity',  
+            color_continuous_scale='Jet',
+            range_color=(-5, 5),
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height'},
+            zoom=zoom_level
+        )
+        fig.update_layout(legend_title_text='Actual Displacement Velocity Average')
 
     elif color_mode == 'anomaly_type':
         if selected_area == 'wroclaw':
-            merged_data = merged_data.merge(all_anomaly_data_99_wroclaw[['pid', 'is_anomaly']], on='pid', how='left')
+            merged_data = filtered_data.merge(all_anomaly_data_99_wroclaw[['pid', 'is_anomaly']], on='pid', how='left')
+        elif selected_area == 'turow':
+            merged_data = filtered_data.merge(anomaly_data_turow_99[['pid', 'is_anomaly']], on='pid', how='left')
+        elif selected_area == 'grunwald':
+            merged_data = filtered_data.merge(anomaly_data_grunwald_99[['pid', 'is_anomaly']], on='pid', how='left')
         else:
-            merged_data = merged_data.merge(anomaly_data_turow_99[['pid', 'is_anomaly']], on='pid', how='left')
+            merged_data = filtered_data.merge(anomaly_data_bedzin_99[['pid', 'is_anomaly']], on='pid', how='left')
 
         merged_data['is_anomaly'] = merged_data['is_anomaly'].fillna(False).astype(bool)
         merged_data['consecutive_anomalies'] = (
@@ -408,8 +631,8 @@ def update_map(map_style, color_mode, orbit_filter, selected_area, prediction_ra
             merged_data,
             lat='latitude', lon='longitude',
             hover_name='pid',
-            hover_data={'latitude': True, 'longitude': True, 'height': True, 'predicted_displacement': True},
-            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'predicted_displacement': 'Predicted Displacement'},
+            hover_data={'latitude': True, 'longitude': True, 'height': True},
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height'},
             color=merged_data['anomaly_3plus'].map({True: 'Anomaly', False: 'No Anomaly'}),
             color_discrete_map={'Anomaly': 'red', 'No Anomaly': 'green'},
             zoom=zoom_level
@@ -418,11 +641,11 @@ def update_map(map_style, color_mode, orbit_filter, selected_area, prediction_ra
 
     elif color_mode == 'orbit':
         fig = px.scatter_mapbox(
-            merged_data,
+            filtered_data,
             lat='latitude', lon='longitude',
             hover_name='pid',
-            hover_data={'latitude': True, 'longitude': True, 'height': True, 'predicted_displacement': True},
-            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'predicted_displacement': 'Predicted Displacement'},
+            hover_data={'latitude': True, 'longitude': True, 'height': True},
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height'},
             color='file',
             zoom=zoom_level
         )
@@ -430,23 +653,23 @@ def update_map(map_style, color_mode, orbit_filter, selected_area, prediction_ra
 
     elif color_mode == 'speed':
         fig = px.scatter_mapbox(
-            merged_data,
+            filtered_data,
             lat='latitude', lon='longitude',
             hover_name='pid',
-            hover_data={'latitude': True, 'longitude': True, 'height': True, 'predicted_displacement': True},
-            color='predicted_displacement',
+            hover_data={'latitude': True, 'longitude': True, 'height': True},
+            color='mean_velocity',
             color_continuous_scale='Jet',
-            range_color=(-5, 5),
-            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height', 'predicted_displacement': 'Predicted Displacement'},
+            labels={'latitude': 'Latitude', 'longitude': 'Longitude', 'height': 'Height'},
             zoom=zoom_level
         )
-        fig.update_layout(legend_title_text='Predicted Displacement')
+        fig.update_layout(legend_title_text='Mean Velocity')
 
     fig.update_layout(
         mapbox_style=map_style,
         autosize=True,
         margin=dict(l=0, r=0, t=0, b=0),
-        mapbox=dict(center=center_coords)
+        mapbox=dict(center=center_coords),
+        coloraxis_colorbar=dict(title=None), 
     )
 
     return fig
@@ -501,7 +724,7 @@ def display_distance(selected_points, distance_calc_enabled):
         ], style={'padding': '10px', 'border': '1px solid #ddd', 'border-radius': '5px'})
     else:
         return "Select two points on the map to calculate the distance."
-    
+
 @app.callback(
     [Output('date-range-picker', 'start_date'),
      Output('date-range-picker', 'end_date'),
@@ -513,6 +736,12 @@ def update_date_picker(selected_area):
     if selected_area == 'wroclaw':
         start_date = all_data_wroclaw['timestamp'].min()
         end_date = all_data_wroclaw['timestamp'].max()
+    elif selected_area == 'bedzin':
+        start_date = all_data_bedzin['timestamp'].min()
+        end_date = all_data_bedzin['timestamp'].max()
+    elif selected_area == 'grunwald':
+        start_date = all_data_grunwald['timestamp'].min()
+        end_date = all_data_grunwald['timestamp'].max()
     else:
         start_date = all_data_turow['timestamp'].min()
         end_date = all_data_turow['timestamp'].max()
@@ -542,19 +771,29 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
         anomaly_data_95 = all_anomaly_data_95_wroclaw
         anomaly_data_99 = all_anomaly_data_99_wroclaw
         last_n_data = full_data.tail(60)
+    elif selected_area == 'grunwald':
+        full_data = all_data_grunwald[all_data_grunwald['pid'] == point_id].copy() 
+        anomaly_data_95 = anomaly_data_grunwald_95
+        anomaly_data_99 = anomaly_data_grunwald_99
+        last_n_data = full_data.tail(61)
+    elif selected_area == 'bedzin':
+        full_data = all_data_bedzin[all_data_bedzin['pid'] == point_id].copy() 
+        anomaly_data_95 = anomaly_data_bedzin_95
+        anomaly_data_99 = anomaly_data_bedzin_99
+        last_n_data = full_data.tail(11)
     else:
         if prediction_method == 'autoencoder':
             full_data = all_data_turow[all_data_turow['pid'] == point_id].copy()
             anomaly_data_95 = anomaly_data_turow_95
             anomaly_data_99 = anomaly_data_turow_99
+            last_n_data = full_data.tail(31)
         elif prediction_method == 'lstm':
             full_data = all_data_turow_lstm[all_data_turow_lstm['pid'] == point_id].copy()
             anomaly_data_95 = anomaly_data_turow_95_lstm
             anomaly_data_99 = anomaly_data_turow_99_lstm
-        last_n_data = full_data.tail(31)
+            last_n_data = full_data.tail(31)
 
     last_n_data.set_index('timestamp', inplace=True)
-
     filtered_data = full_data[(full_data['timestamp'] >= start_date) & (full_data['timestamp'] <= end_date)].copy()
 
     if not last_n_data.empty and (last_n_data.index.min() <= end_date) and (last_n_data.index.max() >= start_date):
@@ -567,21 +806,23 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
 
     if not filtered_anomalies_95.empty:
         filtered_anomalies_95 = filtered_anomalies_95.tail(len(filtered_last_n_data)).copy()
-        filtered_anomalies_95['timestamp'] = filtered_last_n_data.index.values[:len(filtered_anomalies_95)]
-        filtered_anomalies_95.set_index('timestamp', inplace=True)
-        filtered_last_n_data = filtered_last_n_data.join(
-            filtered_anomalies_95[['predicted_value', 'upper_bound', 'lower_bound', 'is_anomaly']], 
-            how='left'
-        )
+        if len(filtered_anomalies_95) > 0:
+            filtered_anomalies_95['timestamp'] = filtered_last_n_data.index.values[:len(filtered_anomalies_95)]
+            filtered_anomalies_95.set_index('timestamp', inplace=True)
+            filtered_last_n_data = filtered_last_n_data.join(
+                filtered_anomalies_95[['predicted_value', 'upper_bound', 'lower_bound', 'is_anomaly']], 
+                how='left'
+            )
 
     if not filtered_anomalies_99.empty:
         filtered_anomalies_99 = filtered_anomalies_99.tail(len(filtered_last_n_data)).copy()
-        filtered_anomalies_99['timestamp'] = filtered_last_n_data.index.values[:len(filtered_anomalies_99)]
-        filtered_anomalies_99.set_index('timestamp', inplace=True)
-        filtered_last_n_data = filtered_last_n_data.join(
-            filtered_anomalies_99[['upper_bound', 'lower_bound', 'is_anomaly']], 
-            how='left', rsuffix='_99'
-        )
+        if len(filtered_anomalies_99) > 0:
+            filtered_anomalies_99['timestamp'] = filtered_last_n_data.index.values[:len(filtered_anomalies_99)]
+            filtered_anomalies_99.set_index('timestamp', inplace=True)
+            filtered_last_n_data = filtered_last_n_data.join(
+                filtered_anomalies_99[['upper_bound', 'lower_bound', 'is_anomaly']], 
+                how='left', rsuffix='_99'
+            )
 
     fig = px.line(filtered_data, x='timestamp', y='displacement', 
                   title=f"Displacement LOS for point {point_id}",
@@ -600,14 +841,15 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
                             name='Predicted Displacement', 
                             line=dict(color='orange'))
 
-        fig.add_scatter(x=filtered_last_n_data.index, y=filtered_last_n_data['upper_bound'], 
-                        mode='lines', line=dict(color='yellow', dash='dash'),
-                        name='Upper Bound p=95')
+        if 'upper_bound' in filtered_last_n_data.columns:
+            fig.add_scatter(x=filtered_last_n_data.index, y=filtered_last_n_data['upper_bound'], 
+                            mode='lines', line=dict(color='yellow', dash='dash'),
+                            name='Upper Bound p=95')
 
-        fig.add_scatter(x=filtered_last_n_data.index, y=filtered_last_n_data['lower_bound'],
-                        mode='lines', line=dict(color='yellow', dash='dash'),
-                        fill='tonexty', fillcolor='rgba(255, 252, 127, 0.2)',
-                        name='Lower Bound p=95')
+            fig.add_scatter(x=filtered_last_n_data.index, y=filtered_last_n_data['lower_bound'],
+                            mode='lines', line=dict(color='yellow', dash='dash'),
+                            fill='tonexty', fillcolor='rgba(255, 252, 127, 0.2)',
+                            name='Lower Bound p=95')
 
         anomalies_95 = filtered_last_n_data[filtered_last_n_data['is_anomaly'] == 1]
         if not anomalies_95.empty:
