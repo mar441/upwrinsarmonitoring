@@ -45,10 +45,10 @@ geo_data_bedzin['pid'] = geo_data_bedzin['pid'].astype(str).str.strip()
 geo_data_grunwald = pd.read_csv('grunwald_geo.csv', delimiter=';')
 geo_data_grunwald['pid'] = geo_data_grunwald['pid'].astype(str).str.strip()
 
-displacement_data_1 = load_displacement_data('mz2_10.csv', 'Ascending 175')
-displacement_data_2 = load_displacement_data('mz4_3.csv', 'Descending 124')
-displacement_data_3 = load_displacement_data('msz4_3.csv', 'Ascending 175')
-displacement_data_4 = load_displacement_data('msz2_3.csv', 'Descending 124')
+displacement_data_1 = load_displacement_data('mz2_10.csv', 'Descending 124')
+displacement_data_2 = load_displacement_data('mz4_3.csv', 'Ascending 175')
+displacement_data_3 = load_displacement_data('msz4_3.csv', 'Descending 124')
+displacement_data_4 = load_displacement_data('msz2_3.csv', 'Ascending 175')
 
 displacement_data_1['pid'] = displacement_data_1['pid'].astype(str).str.strip()
 displacement_data_2['pid'] = displacement_data_2['pid'].astype(str).str.strip()
@@ -70,11 +70,11 @@ displacement_data_turow_lstm = load_displacement_data('tr_73_lstm.csv', 'Ascendi
 displacement_data_turow_lstm['pid'] = displacement_data_turow_lstm['pid'].astype(str).str.strip() 
 all_data_turow_lstm = pd.merge(displacement_data_turow_lstm, geo_data_turow_lstm, on='pid', how='left')
 
-displacement_data_bedzin = load_displacement_data('bedzin_displ.csv', 'Descending 124')
+displacement_data_bedzin = load_displacement_data('bedzin_displ.csv', 'Ascending 175')
 displacement_data_bedzin['pid'] = displacement_data_bedzin['pid'].astype(str).str.strip() 
 all_data_bedzin = pd.merge(displacement_data_bedzin, geo_data_bedzin, on='pid', how='left')
 
-displacement_data_grunwald = load_displacement_data('grunwald_displ.csv', 'Descending 124')
+displacement_data_grunwald = load_displacement_data('grunwald_displ.csv', 'Ascending 175')
 displacement_data_grunwald['pid'] = displacement_data_grunwald['pid'].astype(str).str.strip() 
 all_data_grunwald = pd.merge(displacement_data_grunwald, geo_data_grunwald, on='pid', how='left')
 
