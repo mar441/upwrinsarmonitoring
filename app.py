@@ -45,10 +45,10 @@ geo_data_bedzin['pid'] = geo_data_bedzin['pid'].astype(str).str.strip()
 geo_data_grunwald = pd.read_csv('grunwald_geo.csv', delimiter=';')
 geo_data_grunwald['pid'] = geo_data_grunwald['pid'].astype(str).str.strip()
 
-displacement_data_1 = load_displacement_data('mz2_10.csv', 'Descending 175')
-displacement_data_2 = load_displacement_data('mz4_3.csv', 'Ascending 124')
-displacement_data_3 = load_displacement_data('msz4_3.csv', 'Descending 175')
-displacement_data_4 = load_displacement_data('msz2_3.csv', 'Ascending 124')
+displacement_data_1 = load_displacement_data('mz2_10.csv', 'Ascending 175')
+displacement_data_2 = load_displacement_data('mz4_3.csv', 'Descending 124')
+displacement_data_3 = load_displacement_data('msz4_3.csv', 'Ascending 175')
+displacement_data_4 = load_displacement_data('msz2_3.csv', 'Descending 124')
 
 displacement_data_1['pid'] = displacement_data_1['pid'].astype(str).str.strip()
 displacement_data_2['pid'] = displacement_data_2['pid'].astype(str).str.strip()
@@ -70,11 +70,11 @@ displacement_data_turow_lstm = load_displacement_data('tr_73_lstm.csv', 'Ascendi
 displacement_data_turow_lstm['pid'] = displacement_data_turow_lstm['pid'].astype(str).str.strip() 
 all_data_turow_lstm = pd.merge(displacement_data_turow_lstm, geo_data_turow_lstm, on='pid', how='left')
 
-displacement_data_bedzin = load_displacement_data('bedzin_displ.csv', 'Ascending 124')
+displacement_data_bedzin = load_displacement_data('bedzin_displ.csv', 'Descending 124')
 displacement_data_bedzin['pid'] = displacement_data_bedzin['pid'].astype(str).str.strip() 
 all_data_bedzin = pd.merge(displacement_data_bedzin, geo_data_bedzin, on='pid', how='left')
 
-displacement_data_grunwald = load_displacement_data('grunwald_displ.csv', 'Ascending 124')
+displacement_data_grunwald = load_displacement_data('grunwald_displ.csv', 'Descending 124')
 displacement_data_grunwald['pid'] = displacement_data_grunwald['pid'].astype(str).str.strip() 
 all_data_grunwald = pd.merge(displacement_data_grunwald, geo_data_grunwald, on='pid', how='left')
 
@@ -273,6 +273,23 @@ MAX_ACTUAL_GRUNWALD = actual_grunwald_prefix.columns.max()
 
 px.set_mapbox_access_token('pk.eyJ1IjoibWFycGllayIsImEiOiJjbTBxbXBsMGQwYjgyMmxzN3RpdmlhZDVrIn0.YWJh1RM6HKfN_pbH-jtJ6A')
 
+orbit_geometry_info = {
+    'Ascending 175': {
+        'Relative orbit number': '175',
+        'View angle': '348.9°',
+        'Mean Incidence angle': '33.18°'  
+    },
+    'Descending 124': {
+        'Relative orbit number': '124',
+        'View angle': '189.35°',  
+        'Mean Incidence angle': '42.64°'  
+    },
+    'Ascending 73': {
+        'Relative orbit number': '73',
+        'View angle': '350.49°', 
+        'Mean Incidence angle': '41.85°' 
+    }}
+
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
 app.layout = html.Div([
@@ -305,7 +322,7 @@ app.layout = html.Div([
                     {'label': 'Displacement Mean Velocity [mm/year]', 'value': 'speed'},
                     {'label': 'Anomaly Type', 'value': 'anomaly_type'},
                     {'label': 'Prediction Velocity', 'value': 'prediction_velocity'},
-                    {'label': 'Actual Displacement Velocity', 'value': 'actual_displacement_velocity'}
+                    {'label': 'Cumulative Displacement', 'value': 'actual_displacement_velocity'}
                 ],
                 value='orbit',
                 clearable=False,
@@ -314,14 +331,14 @@ app.layout = html.Div([
         ], style={'display': 'inline-block', 'width': '19%', 'padding': '10px'}),
 
         html.Div([
-            html.Label("Filter by Orbit Type"),
+            html.Label("Filter by LOS Geometry"),
             dcc.Dropdown(
                 id='orbit-filter-dropdown',
                 options=[
-                    {'label': 'Ascending 124', 'value': 'Ascending 124'},
-                    {'label': 'Descending 175', 'value': 'Descending 175'}
+                    {'label': 'Ascending 175', 'value': 'Ascending 175'},
+                    {'label': 'Descending 124', 'value': 'Descending 124'}
                 ],
-                value='Ascending 124',
+                value='Ascending 175',
                 multi=True,
                 clearable=False,
                 style={'width': '100%'}
@@ -381,11 +398,11 @@ app.layout = html.Div([
             id='dynamic-prediction-range-slider',
             min=1,
             max=60,
-            step=1,
-            marks={i: str(i) for i in range(1, 61)},
-            value=[1, 5],
+            step=1, 
+            marks={}, 
+            value=[1,5],
             tooltip={"placement": "bottom", "always_visible": True},
-            allowCross=False  
+            allowCross=False   
         )
     ], id='prediction-slider-container', style={'display': 'none', 'padding': '10px'}),  
 
@@ -454,12 +471,12 @@ def update_orbit_filter(selected_area):
     if selected_area == 'turow':
         return [{'label': 'Ascending 73', 'value': 'Ascending 73'}], 'Ascending 73', True
     elif selected_area == 'bedzin':
-        return [{'label': 'Ascending 124', 'value': 'Ascending 124'}], 'Ascending 124', True
+        return [{'label': 'Ascending 175', 'value': 'Ascending 175'}], 'Ascending 175', True
     elif selected_area == 'grunwald':
-        return [{'label': 'Ascending 124', 'value': 'Ascending 124'}], 'Ascending 124', True
+        return [{'label': 'Ascending 175', 'value': 'Ascending 175'}], 'Ascending 175', True
     else:
-        return [{'label': 'Ascending 124', 'value': 'Ascending 124'}, 
-                {'label': 'Descending 175', 'value': 'Descending 175'}], 'Ascending 124', False
+        return [{'label': 'Ascending 175', 'value': 'Ascending 175'}, 
+                {'label': 'Descending 124', 'value': 'Descending 124'}], 'Ascending 175', False
 
 @app.callback(
     [Output('dynamic-prediction-range-slider', 'max'),
@@ -470,28 +487,41 @@ def update_orbit_filter(selected_area):
      Input('prediction-method-dropdown', 'value')]
 )
 def update_slider_max(selected_area, color_mode, prediction_method):
-    if color_mode == 'prediction_velocity':
-        if selected_area == 'turow':
-            max_val = MAX_TUROW
-        elif selected_area == 'bedzin':
-            max_val = MAX_BEDZIN
-        elif selected_area == 'grunwald':
-            max_val = MAX_GRUNWALD
-        else:
-            max_val = MAX_WROCLAW
-    elif color_mode == 'actual_displacement_velocity':
-        if selected_area == 'turow':
-            max_val = MAX_ACTUAL_TUROW
-        elif selected_area == 'bedzin':
-            max_val = MAX_ACTUAL_BEDZIN
-        elif selected_area == 'grunwald':
-            max_val = MAX_ACTUAL_GRUNWALD
-        else:
-            max_val = MAX_ACTUAL_WROCLAW
-    else:
-        max_val = 60
 
-    marks = {i: str(i) for i in range(1, max_val+1)}
+    if color_mode == 'actual_displacement_velocity':
+        max_val = {
+            'turow': MAX_ACTUAL_TUROW,
+            'bedzin': MAX_ACTUAL_BEDZIN,
+            'grunwald': MAX_ACTUAL_GRUNWALD
+        }.get(selected_area, MAX_ACTUAL_WROCLAW)
+    else:
+        max_val = 60  
+        
+    data_for_area = {
+        'wroclaw': all_data_wroclaw,
+        'turow': all_data_turow,
+        'bedzin': all_data_bedzin,
+        'grunwald': all_data_grunwald
+    }.get(selected_area, all_data_wroclaw)
+
+    timestamps_df = data_for_area.drop_duplicates(subset='obs_step')[['obs_step', 'timestamp']].sort_values('obs_step')
+
+    if max_val > 60:
+        N = 40 
+    elif max_val > 20:
+        N = 15  
+    else:
+        N = 5  
+
+    marks = {}
+    for _, row in timestamps_df.iterrows():
+        step_val = row['obs_step']
+        if step_val <= max_val:
+            if step_val == 1 or step_val == max_val or step_val % N == 0:
+                marks[step_val] = row['timestamp'].strftime('%Y-%m-%d')  
+            else:
+                marks[step_val] = "" 
+
     default_end = min(5, max_val)
     return max_val, marks, [1, default_end]
 
@@ -520,12 +550,12 @@ def update_map(map_style, color_mode, orbit_filter, selected_area, pred_range, p
         data = all_data_grunwald.drop_duplicates(subset=['pid'])
         center_coords = {'lat': 51.11249671461431, 'lon': 17.06133312265709}
         zoom_level = 14
-        orbit_filter = ['Ascending 124']
+        orbit_filter = ['Ascending 175']
     else:
         data = all_data_bedzin.drop_duplicates(subset=['pid'])
-        center_coords = {'lat': 50.32131449, 'lon': 19.1212986}
-        zoom_level = 14
-        orbit_filter = ['Ascending 124']
+        center_coords = {'lat': all_data_bedzin['latitude'].mean(), 'lon': all_data_bedzin['longitude'].mean()}
+        zoom_level = 14.5
+        orbit_filter = ['Ascending 175']
 
     if isinstance(orbit_filter, str):
         orbit_filter = [orbit_filter]
@@ -663,6 +693,36 @@ def update_map(map_style, color_mode, orbit_filter, selected_area, pred_range, p
             zoom=zoom_level
         )
         fig.update_layout(legend_title_text='Mean Velocity')
+        
+    if orbit_filter is not None:
+        if isinstance(orbit_filter, str):
+            orbit_filter = [orbit_filter]
+
+        annotation_lines = ["Orbit Geometry Info:<br>"]
+        for orbit in orbit_filter:
+            if orbit in orbit_geometry_info:
+                info = orbit_geometry_info[orbit]
+                annotation_lines.append(
+                    f"<b>{orbit}</b>:<br>"
+                    f"Relative orbit number: {info['Relative orbit number']}<br>"
+                    f"View angle: {info['View angle']}<br>"
+                    f"Mean Incidence angle: {info['Mean Incidence angle']}<br><br>"
+                )
+
+        if len(annotation_lines) > 1:
+            annotation_text = "".join(annotation_lines)
+            fig.add_annotation(
+                text=annotation_text,
+                xref="paper", yref="paper",
+                x=1, y=1,
+                showarrow=False,
+                align="left",
+                bordercolor="#cccccc",
+                borderwidth=1,
+                borderpad=4,
+                bgcolor="white",
+                opacity=0.8
+            )
 
     fig.update_layout(
         mapbox_style=map_style,
