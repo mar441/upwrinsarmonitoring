@@ -522,7 +522,7 @@ app.layout = html.Div([
             )
         ],
         id="legend-modal",
-        is_open=False,
+        is_open=False,  
         backdrop=False,
         content_style={"borderRadius": "12px", "backgroundColor": "white"},
         size="lg",
