@@ -322,7 +322,7 @@ all_data_bedzin_ml = pd.merge(all_data_bedzin_ml, mean_velocity_data_bedzin_ml, 
 
 def compute_prefix_sums(data):
     data = data.sort_values(by=['pid', 'step'])
-    pivot = data.pivot(index='pid', columns='step', values='predicted_displacement').fillna(0).round(1)
+    pivot = data.pivot(index='pid', columns='step', values='predicted_displacement').apply(pd.to_numeric, errors='coerce').fillna(0).round(1)
     pivot.columns = pivot.columns.astype(int) 
     pivot = pivot.sort_index(axis=1)
     for col in pivot.columns[1:]:
@@ -340,14 +340,14 @@ bedzin_dense_prefix = compute_prefix_sums(prediction_data_bedzin_dense)
 bedzin_ml_prefix = compute_prefix_sums(prediction_data_bedzin_ml)
 
 prefix_data = {
-    ('wroclaw', 'autoencoder'): wroclaw_prefix,
-    ('turow', 'autoencoder'): turow_prefix,
+    ('wroclaw', 'dense'): wroclaw_prefix,
+    ('turow', 'dense'): turow_prefix,
     ('turow', 'lstm'): turow_lstm_prefix,
     ('bedzin', 'lstm'): bedzin_lstm_prefix,
     ('bedzin', 'conv'): bedzin_conv_prefix,
     ('bedzin', 'dense'): bedzin_dense_prefix,
     ('bedzin', 'ml'): bedzin_ml_prefix,
-    ('grunwald', 'autoencoder'): grunwald_prefix,
+    ('grunwald', 'dense'): grunwald_prefix,
     ('grunwald', 'lstm'): grunwald_lstm_prefix,
 }
 
@@ -355,6 +355,7 @@ MAX_WROCLAW = wroclaw_prefix.columns.max()
 MAX_TUROW = turow_prefix.columns.max()
 MAX_BEDZIN = bedzin_dense_prefix.columns.max()
 MAX_GRUNWALD = grunwald_prefix.columns.max()
+
 def add_obs_step(df):
     df = df.sort_values(by=['pid', 'timestamp'])
     df['obs_step'] = df.groupby('pid').cumcount() + 1
