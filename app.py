@@ -443,7 +443,7 @@ app.layout = html.Div([
             dbc.ModalBody(
                 html.Div([
                     html.Iframe(
-                        src="https://mar441.github.io/upwrinsarmonitoring/INSTRUKCJA_OBSLUGI_SERWISU.html",
+                        src="https://mar441.github.io/upwrinsarmonitoring/instrukcja.html",
                         style={"height": "400px", "width": "100%"}
                     )
                 ])
