@@ -411,8 +411,6 @@ orbit_geometry_info = {
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-app = dash.Dash(__name__, suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.BOOTSTRAP])
-
 app.layout = html.Div([
 
     html.Div([
