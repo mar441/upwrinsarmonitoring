@@ -444,14 +444,14 @@ app.layout = html.Div([
                 html.Div([
                     html.Iframe(
                         src="https://mar441.github.io/upwrinsarmonitoring/instrukcja.html",
-                        style={"height": "400px", "width": "100%"}
+                        style={"height": "90vh", "width": "100%"}
                     )
                 ])
             )
         ],
         id="help-modal",
         is_open=False,
-        size="lg",
+        size="xl",
         style={"overflowY": "auto"}
     ),
     dbc.Modal(
