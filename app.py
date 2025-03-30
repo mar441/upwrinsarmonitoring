@@ -164,65 +164,65 @@ displacement_data_zapora_ml = load_displacement_data('zapora_displ.csv',
 displacement_data_zapora_ml['pid'] = displacement_data_zapora_ml['pid'].astype(str).str.strip() 
 all_data_zapora_ml = pd.merge(displacement_data_zapora_ml, geo_data_zapora_ml, on='pid', how='left')
 
-prediction_data_koz_conv = pd.read_csv('predictions_koz_conv.csv', delimiter=',')
-prediction_data_koz_conv = prediction_data_koz_conv.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_koz_conv['label'] = 'CONV Kozielno Prediction Set'
-prediction_data_koz_conv['step'] = prediction_data_koz_conv.groupby('pid').cumcount()
+displacement_data_koz_lstm = load_displacement_data('final_koz.csv', 
+                                                      'Descending 22')
+displacement_data_koz_lstm['pid'] = displacement_data_koz_lstm['pid'].astype(str).str.strip() 
+all_data_koz_lstm = pd.merge(displacement_data_koz_lstm, geo_data_koz_lstm, on='pid', how='left')
 
-prediction_data_koz_lstm = pd.read_csv('predictions_koz_lstm.csv', delimiter=',')
-prediction_data_koz_lstm = prediction_data_koz_lstm.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_koz_lstm['label'] = 'LSTM Kozielno Prediction Set'
-prediction_data_koz_lstm['step'] = prediction_data_koz_lstm.groupby('pid').cumcount()
+displacement_data_koz_conv = load_displacement_data('final_koz.csv', 
+                                                      'Descending 22')
+displacement_data_koz_conv['pid'] = displacement_data_koz_conv['pid'].astype(str).str.strip() 
+all_data_koz_conv = pd.merge(displacement_data_koz_conv, geo_data_koz_conv, on='pid', how='left')
 
-prediction_data_koz_dense = pd.read_csv('predictions_koz_dense.csv', delimiter=',')
-prediction_data_koz_dense = prediction_data_koz_dense.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_koz_dense['label'] = 'DENSE Kozielno Prediction Set'
-prediction_data_koz_dense['step'] = prediction_data_koz_dense.groupby('pid').cumcount()
+displacement_data_koz_dense = load_displacement_data('final_koz.csv', 
+                                                      'Descending 22')
+displacement_data_koz_dense['pid'] = displacement_data_koz_dense['pid'].astype(str).str.strip() 
+all_data_koz_dense = pd.merge(displacement_data_koz_dense, geo_data_koz_dense, on='pid', how='left')
 
-prediction_data_koz_ml = pd.read_csv('predictions_koz_ml.csv', delimiter=',')
-prediction_data_koz_ml = prediction_data_koz_ml.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_koz_ml['label'] = 'ML Kozielno Prediction Set'
-prediction_data_koz_ml['step'] = prediction_data_koz_ml.groupby('pid').cumcount()
+displacement_data_koz_ml = load_displacement_data('final_koz.csv', 
+                                                      'Descending 22')
+displacement_data_koz_ml['pid'] = displacement_data_koz_ml['pid'].astype(str).str.strip() 
+all_data_koz_ml = pd.merge(displacement_data_koz_ml, geo_data_koz_ml, on='pid', how='left')
 
-prediction_data_top_conv = pd.read_csv('predictions_top_conv.csv', delimiter=',')
-prediction_data_top_conv = prediction_data_top_conv.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_top_conv['label'] = 'CONV Topola Prediction Set'
-prediction_data_top_conv['step'] = prediction_data_top_conv.groupby('pid').cumcount()
+displacement_data_top_lstm = load_displacement_data('final_top.csv', 
+                                                      'Descending 22')
+displacement_data_top_lstm['pid'] = displacement_data_top_lstm['pid'].astype(str).str.strip() 
+all_data_top_lstm = pd.merge(displacement_data_top_lstm, geo_data_top_lstm, on='pid', how='left')
 
-prediction_data_top_lstm = pd.read_csv('predictions_top_lstm.csv', delimiter=',')
-prediction_data_top_lstm = prediction_data_top_lstm.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_top_lstm['label'] = 'LSTM Topola Prediction Set'
-prediction_data_top_lstm['step'] = prediction_data_top_lstm.groupby('pid').cumcount()
+displacement_data_top_conv = load_displacement_data('final_top.csv', 
+                                                      'Descending 22')
+displacement_data_top_conv['pid'] = displacement_data_top_conv['pid'].astype(str).str.strip() 
+all_data_top_conv = pd.merge(displacement_data_top_conv, geo_data_top_conv, on='pid', how='left')
 
-prediction_data_top_dense = pd.read_csv('predictions_top_dense.csv', delimiter=',')
-prediction_data_top_dense = prediction_data_top_dense.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_top_dense['label'] = 'DENSE Topola Prediction Set'
-prediction_data_top_dense['step'] = prediction_data_top_dense.groupby('pid').cumcount()
+displacement_data_top_dense = load_displacement_data('final_top.csv', 
+                                                      'Descending 22')
+displacement_data_top_dense['pid'] = displacement_data_top_dense['pid'].astype(str).str.strip() 
+all_data_top_dense = pd.merge(displacement_data_top_dense, geo_data_top_dense, on='pid', how='left')
 
-prediction_data_top_ml = pd.read_csv('predictions_top_ml.csv', delimiter=',')
-prediction_data_top_ml = prediction_data_top_ml.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_top_ml['label'] = 'ML Topola Prediction Set'
-prediction_data_top_ml['step'] = prediction_data_top_ml.groupby('pid').cumcount()
+displacement_data_top_ml = load_displacement_data('final_top.csv', 
+                                                      'Descending 22')
+displacement_data_top_ml['pid'] = displacement_data_top_ml['pid'].astype(str).str.strip() 
+all_data_top_ml = pd.merge(displacement_data_top_ml, geo_data_top_ml, on='pid', how='left')
 
-prediction_data_nysa_conv = pd.read_csv('predictions_nysa_conv.csv', delimiter=',')
-prediction_data_nysa_conv = prediction_data_nysa_conv.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_nysa_conv['label'] = 'CONV Nysa Prediction Set'
-prediction_data_nysa_conv['step'] = prediction_data_nysa_conv.groupby('pid').cumcount()
+displacement_data_nysa_lstm = load_displacement_data('final_nysa.csv', 
+                                                      'Descending 22')
+displacement_data_nysa_lstm['pid'] = displacement_data_nysa_lstm['pid'].astype(str).str.strip() 
+all_data_nysa_lstm = pd.merge(displacement_data_nysa_lstm, geo_data_nysa_lstm, on='pid', how='left')
 
-prediction_data_nysa_lstm = pd.read_csv('predictions_nysa_lstm.csv', delimiter=',')
-prediction_data_nysa_lstm = prediction_data_nysa_lstm.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_nysa_lstm['label'] = 'LSTM Nysa Prediction Set'
-prediction_data_nysa_lstm['step'] = prediction_data_nysa_lstm.groupby('pid').cumcount()
+displacement_data_nysa_conv = load_displacement_data('final_nysa.csv', 
+                                                      'Descending 22')
+displacement_data_nysa_conv['pid'] = displacement_data_nysa_conv['pid'].astype(str).str.strip() 
+all_data_nysa_conv = pd.merge(displacement_data_nysa_conv, geo_data_nysa_conv, on='pid', how='left')
 
-prediction_data_nysa_dense = pd.read_csv('predictions_nysa_dense.csv', delimiter=',')
-prediction_data_nysa_dense = prediction_data_nysa_dense.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_nysa_dense['label'] = 'DENSE Nysa Prediction Set'
-prediction_data_nysa_dense['step'] = prediction_data_nysa_dense.groupby('pid').cumcount()
+displacement_data_nysa_dense = load_displacement_data('Dfinal_nysa.csv', 
+                                                      'Descending 22')
+displacement_data_nysa_dense['pid'] = displacement_data_nysa_dense['pid'].astype(str).str.strip() 
+all_data_nysa_dense = pd.merge(displacement_data_nysa_dense, geo_data_nysa_dense, on='pid', how='left')
 
-prediction_data_nysa_ml = pd.read_csv('predictions_nysa_ml.csv', delimiter=',')
-prediction_data_nysa_ml = prediction_data_nysa_ml.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_nysa_ml['label'] = 'ML Nysa Prediction Set'
-prediction_data_nysa_ml['step'] = prediction_data_nysa_ml.groupby('pid').cumcount()
+displacement_data_nysa_ml = load_displacement_data('final_nysa.csv', 
+                                                      'Descending 22')
+displacement_data_nysa_ml['pid'] = displacement_data_nysa_ml['pid'].astype(str).str.strip() 
+all_data_nysa_ml = pd.merge(displacement_data_nysa_ml, geo_data_nysa_ml, on='pid', how='left')
 
 prediction_data_1 = pd.read_csv('predictions_values.csv')
 prediction_data_1 = prediction_data_1.melt(var_name='pid', 
@@ -299,6 +299,66 @@ prediction_data_zapora_ml = pd.read_csv('predictions_zapora_ml.csv', delimiter='
 prediction_data_zapora_ml = prediction_data_zapora_ml.melt(var_name='pid', value_name='predicted_displacement')
 prediction_data_zapora_ml['label'] = 'ML Zapora Prediction Set'
 prediction_data_zapora_ml['step'] = prediction_data_zapora_ml.groupby('pid').cumcount()
+
+prediction_data_koz_conv = pd.read_csv('predictions_koz_conv.csv', delimiter=',')
+prediction_data_koz_conv = prediction_data_koz_conv.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_koz_conv['label'] = 'CONV Kozielno Prediction Set'
+prediction_data_koz_conv['step'] = prediction_data_koz_conv.groupby('pid').cumcount()
+
+prediction_data_koz_lstm = pd.read_csv('predictions_koz_lstm.csv', delimiter=',')
+prediction_data_koz_lstm = prediction_data_koz_lstm.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_koz_lstm['label'] = 'LSTM Kozielno Prediction Set'
+prediction_data_koz_lstm['step'] = prediction_data_koz_lstm.groupby('pid').cumcount()
+
+prediction_data_koz_dense = pd.read_csv('predictions_koz_dense.csv', delimiter=',')
+prediction_data_koz_dense = prediction_data_koz_dense.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_koz_dense['label'] = 'DENSE Kozielno Prediction Set'
+prediction_data_koz_dense['step'] = prediction_data_koz_dense.groupby('pid').cumcount()
+
+prediction_data_koz_ml = pd.read_csv('predictions_koz_ml.csv', delimiter=',')
+prediction_data_koz_ml = prediction_data_koz_ml.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_koz_ml['label'] = 'ML Kozielno Prediction Set'
+prediction_data_koz_ml['step'] = prediction_data_koz_ml.groupby('pid').cumcount()
+
+prediction_data_top_conv = pd.read_csv('predictions_top_conv.csv', delimiter=',')
+prediction_data_top_conv = prediction_data_top_conv.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_top_conv['label'] = 'CONV Topola Prediction Set'
+prediction_data_top_conv['step'] = prediction_data_top_conv.groupby('pid').cumcount()
+
+prediction_data_top_lstm = pd.read_csv('predictions_top_lstm.csv', delimiter=',')
+prediction_data_top_lstm = prediction_data_top_lstm.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_top_lstm['label'] = 'LSTM Topola Prediction Set'
+prediction_data_top_lstm['step'] = prediction_data_top_lstm.groupby('pid').cumcount()
+
+prediction_data_top_dense = pd.read_csv('predictions_top_dense.csv', delimiter=',')
+prediction_data_top_dense = prediction_data_top_dense.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_top_dense['label'] = 'DENSE Topola Prediction Set'
+prediction_data_top_dense['step'] = prediction_data_top_dense.groupby('pid').cumcount()
+
+prediction_data_top_ml = pd.read_csv('predictions_top_ml.csv', delimiter=',')
+prediction_data_top_ml = prediction_data_top_ml.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_top_ml['label'] = 'ML Topola Prediction Set'
+prediction_data_top_ml['step'] = prediction_data_top_ml.groupby('pid').cumcount()
+
+prediction_data_nysa_conv = pd.read_csv('predictions_nysa_conv.csv', delimiter=',')
+prediction_data_nysa_conv = prediction_data_nysa_conv.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_nysa_conv['label'] = 'CONV Nysa Prediction Set'
+prediction_data_nysa_conv['step'] = prediction_data_nysa_conv.groupby('pid').cumcount()
+
+prediction_data_nysa_lstm = pd.read_csv('predictions_nysa_lstm.csv', delimiter=',')
+prediction_data_nysa_lstm = prediction_data_nysa_lstm.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_nysa_lstm['label'] = 'LSTM Nysa Prediction Set'
+prediction_data_nysa_lstm['step'] = prediction_data_nysa_lstm.groupby('pid').cumcount()
+
+prediction_data_nysa_dense = pd.read_csv('predictions_nysa_dense.csv', delimiter=',')
+prediction_data_nysa_dense = prediction_data_nysa_dense.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_nysa_dense['label'] = 'DENSE Nysa Prediction Set'
+prediction_data_nysa_dense['step'] = prediction_data_nysa_dense.groupby('pid').cumcount()
+
+prediction_data_nysa_ml = pd.read_csv('predictions_nysa_ml.csv', delimiter=',')
+prediction_data_nysa_ml = prediction_data_nysa_ml.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_nysa_ml['label'] = 'ML Nysa Prediction Set'
+prediction_data_nysa_ml['step'] = prediction_data_nysa_ml.groupby('pid').cumcount()
 
 anomaly_data_1_95 = load_anomaly_data('anomaly_output_95.csv', 'Anomaly Set 1 (95%)')
 anomaly_data_2_95 = load_anomaly_data('anomaly_output2_95.csv', 'Anomaly Set 2 (95%)')
