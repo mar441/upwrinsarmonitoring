@@ -132,6 +132,59 @@ prediction_data_otm_dense = prediction_data_otm_dense.melt(var_name='pid', value
 prediction_data_otm_dense['label'] = 'DENSE OTM Prediction Set'
 prediction_data_otm_dense['step'] = prediction_data_otm_dense.groupby('pid').cumcount()
 
+all_data_wroclaw.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_wroclaw['displacement_diff'] = all_data_wroclaw.groupby('pid')['displacement'].diff().round(1)
+all_data_wroclaw['time_diff'] = all_data_wroclaw.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_wroclaw['displacement_speed'] = ((all_data_wroclaw['displacement_diff'] / all_data_wroclaw['time_diff']) * 365).round(1)
+
+mean_velocity_data_wroclaw = all_data_wroclaw.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_wroclaw.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_wroclaw = pd.merge(all_data_wroclaw, mean_velocity_data_wroclaw, on='pid', how='left')
+
+all_data_zapora_dense.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_zapora_dense['displacement_diff'] = all_data_zapora_dense.groupby('pid')['displacement'].diff().round(1)
+all_data_zapora_dense['time_diff'] = all_data_zapora_dense.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_zapora_dense['displacement_speed'] = ((all_data_zapora_dense['displacement_diff'] / all_data_zapora_dense['time_diff']) * 365).round(1)
+
+mean_velocity_data_zapora_dense = all_data_zapora_dense.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_zapora_dense.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_zapora_dense = pd.merge(all_data_zapora_dense, mean_velocity_data_zapora_dense, on='pid', how='left')
+
+all_data_koz_dense.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_koz_dense['displacement_diff'] = all_data_koz_dense.groupby('pid')['displacement'].diff().round(1)
+all_data_koz_dense['time_diff'] = all_data_koz_dense.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_koz_dense['displacement_speed'] = ((all_data_koz_dense['displacement_diff'] / all_data_koz_dense['time_diff']) * 365).round(1)
+
+mean_velocity_data_koz_dense = all_data_koz_dense.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_koz_dense.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_koz_dense = pd.merge(all_data_koz_dense, mean_velocity_data_koz_dense, on='pid', how='left')
+
+all_data_top_dense.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_top_dense['displacement_diff'] = all_data_top_dense.groupby('pid')['displacement'].diff().round(1)
+all_data_top_dense['time_diff'] = all_data_top_dense.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_top_dense['displacement_speed'] = ((all_data_top_dense['displacement_diff'] / all_data_top_dense['time_diff']) * 365).round(1)
+
+mean_velocity_data_top_dense = all_data_top_dense.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_top_dense.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_top_dense = pd.merge(all_data_top_dense, mean_velocity_data_top_dense, on='pid', how='left')
+
+all_data_nysa_dense.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_nysa_dense['displacement_diff'] = all_data_nysa_dense.groupby('pid')['displacement'].diff().round(1)
+all_data_nysa_dense['time_diff'] = all_data_nysa_dense.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_nysa_dense['displacement_speed'] = ((all_data_nysa_dense['displacement_diff'] / all_data_nysa_dense['time_diff']) * 365).round(1)
+
+mean_velocity_data_nysa_dense = all_data_nysa_dense.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_nysa_dense.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_nysa_dense = pd.merge(all_data_nysa_dense, mean_velocity_data_nysa_dense, on='pid', how='left')
+
+all_data_otm_dense.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_otm_dense['displacement_diff'] = all_data_otm_dense.groupby('pid')['displacement'].diff().round(1)
+all_data_otm_dense['time_diff'] = all_data_otm_dense.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_otm_dense['displacement_speed'] = ((all_data_otm_dense['displacement_diff'] / all_data_otm_dense['time_diff']) * 365).round(1)
+
+mean_velocity_data_otm_dense = all_data_otm_dense.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_otm_dense.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_otm_dense = pd.merge(all_data_otm_dense, mean_velocity_data_otm_dense, on='pid', how='left')
 
 def compute_prefix_sums(data):
     data = data.sort_values(by=['pid', 'step'])
