@@ -37,24 +37,6 @@ geo_data_4 = pd.read_csv('msz_2.csv')
 geo_data_wroclaw = pd.concat([geo_data_1, geo_data_2, geo_data_3, geo_data_4], ignore_index=True)
 geo_data_wroclaw['pid'] = geo_data_wroclaw['pid'].astype(str).str.strip()  
 
-geo_data_grunwald = pd.read_csv('grunwald_geo.csv', delimiter=';')
-geo_data_grunwald['pid'] = geo_data_grunwald['pid'].astype(str).str.strip()
-
-geo_data_grunwald_lstm = pd.read_csv('grunwald_geo.csv', delimiter=';')
-geo_data_grunwald_lstm['pid'] = geo_data_grunwald_lstm['pid'].astype(str).str.strip()
-
-geo_data_bedzin_lstm = pd.read_csv('bedzin_geo.csv', delimiter=';')
-geo_data_bedzin_lstm['pid'] = geo_data_bedzin_lstm['pid'].astype(str).str.strip()
-
-geo_data_bedzin_conv = pd.read_csv('bedzin_geo.csv', delimiter=';')
-geo_data_bedzin_conv['pid'] = geo_data_bedzin_conv['pid'].astype(str).str.strip()
-
-geo_data_bedzin_dense = pd.read_csv('bedzin_geo.csv', delimiter=';')
-geo_data_bedzin_dense['pid'] = geo_data_bedzin_dense['pid'].astype(str).str.strip()
-
-geo_data_bedzin_ml = pd.read_csv('bedzin_geo.csv', delimiter=';')
-geo_data_bedzin_ml['pid'] = geo_data_bedzin_ml['pid'].astype(str).str.strip()
-
 geo_data_zapora_lstm = pd.read_csv('zapora_geo.csv', delimiter=',')
 geo_data_zapora_lstm['pid'] = geo_data_zapora_lstm['pid'].astype(str).str.strip()
 
@@ -103,6 +85,18 @@ geo_data_nysa_dense['pid'] = geo_data_nysa_dense['pid'].astype(str).str.strip()
 geo_data_nysa_ml = pd.read_csv('nysa_geo.csv', delimiter=',')
 geo_data_nysa_ml['pid'] = geo_data_nysa_ml['pid'].astype(str).str.strip()
 
+geo_data_otm_lstm = pd.read_csv('otm_geo.csv', delimiter=',')
+geo_data_otm_lstm['pid'] = geo_data_otm_lstm['pid'].astype(str).str.strip()
+
+geo_data_otm_conv = pd.read_csv('otm_geo.csv', delimiter=',')
+geo_data_otm_conv['pid'] = geo_data_otm_conv['pid'].astype(str).str.strip()
+
+geo_data_otm_dense = pd.read_csv('otm_geo.csv', delimiter=',')
+geo_data_otm_dense['pid'] = geo_data_otm_dense['pid'].astype(str).str.strip()
+
+geo_data_otm_ml = pd.read_csv('otm_geo.csv', delimiter=',')
+geo_data_otm_ml['pid'] = geo_data_otm_ml['pid'].astype(str).str.strip()
+
 displacement_data_1 = load_displacement_data('mz2_10.csv', 'Descending 124')
 displacement_data_2 = load_displacement_data('mz4_3.csv', 'Ascending 175')
 displacement_data_3 = load_displacement_data('msz4_3.csv', 'Descending 124')
@@ -119,30 +113,6 @@ all_data_3 = pd.merge(displacement_data_3, geo_data_wroclaw, on='pid', how='left
 all_data_4 = pd.merge(displacement_data_4, geo_data_wroclaw, on='pid', how='left')
 
 all_data_wroclaw = pd.concat([all_data_1, all_data_2, all_data_3, all_data_4], ignore_index=True)
-
-displacement_data_grunwald = load_displacement_data('grunwald_displ.csv', 'Ascending 175')
-displacement_data_grunwald['pid'] = displacement_data_grunwald['pid'].astype(str).str.strip() 
-all_data_grunwald = pd.merge(displacement_data_grunwald, geo_data_grunwald, on='pid', how='left')
-
-displacement_data_grunwald_lstm  = load_displacement_data('grunwald_displ.csv', 'Ascending 175')
-displacement_data_grunwald_lstm ['pid'] = displacement_data_grunwald_lstm ['pid'].astype(str).str.strip() 
-all_data_grunwald_lstm  = pd.merge(displacement_data_grunwald_lstm , geo_data_grunwald_lstm , on='pid', how='left')
-
-displacement_data_bedzin_lstm = load_displacement_data('bedzin_displ.csv', 'Ascending 175')
-displacement_data_bedzin_lstm['pid'] = displacement_data_bedzin_lstm['pid'].astype(str).str.strip() 
-all_data_bedzin_lstm = pd.merge(displacement_data_bedzin_lstm, geo_data_bedzin_lstm, on='pid', how='left')
-
-displacement_data_bedzin_conv = load_displacement_data('bedzin_displ.csv', 'Ascending 175')
-displacement_data_bedzin_conv['pid'] = displacement_data_bedzin_conv['pid'].astype(str).str.strip() 
-all_data_bedzin_conv = pd.merge(displacement_data_bedzin_conv, geo_data_bedzin_conv, on='pid', how='left')
-
-displacement_data_bedzin_dense = load_displacement_data('bedzin_displ.csv', 'Ascending 175')
-displacement_data_bedzin_dense['pid'] = displacement_data_bedzin_dense['pid'].astype(str).str.strip() 
-all_data_bedzin_dense = pd.merge(displacement_data_bedzin_dense, geo_data_bedzin_dense, on='pid', how='left')
-
-displacement_data_bedzin_ml = load_displacement_data('bedzin_displ.csv', 'Ascending 175')
-displacement_data_bedzin_ml['pid'] = displacement_data_bedzin_ml['pid'].astype(str).str.strip() 
-all_data_bedzin_ml = pd.merge(displacement_data_bedzin_ml, geo_data_bedzin_ml, on='pid', how='left')
 
 displacement_data_zapora_lstm = load_displacement_data('zapora_displ.csv', 
                                                       'Descending 51')
@@ -224,6 +194,26 @@ displacement_data_nysa_ml = load_displacement_data('final_nysa.csv',
 displacement_data_nysa_ml['pid'] = displacement_data_nysa_ml['pid'].astype(str).str.strip() 
 all_data_nysa_ml = pd.merge(displacement_data_nysa_ml, geo_data_nysa_ml, on='pid', how='left')
 
+displacement_data_otm_lstm = load_displacement_data('final_otm.csv', 
+                                                      'Descending 22')
+displacement_data_otm_lstm['pid'] = displacement_data_otm_lstm['pid'].astype(str).str.strip() 
+all_data_otm_lstm = pd.merge(displacement_data_otm_lstm, geo_data_otm_lstm, on='pid', how='left')
+
+displacement_data_otm_conv = load_displacement_data('final_otm.csv', 
+                                                      'Descending 22')
+displacement_data_otm_conv['pid'] = displacement_data_otm_conv['pid'].astype(str).str.strip() 
+all_data_otm_conv = pd.merge(displacement_data_otm_conv, geo_data_otm_conv, on='pid', how='left')
+
+displacement_data_otm_dense = load_displacement_data('final_otm.csv', 
+                                                      'Descending 22')
+displacement_data_otm_dense['pid'] = displacement_data_otm_dense['pid'].astype(str).str.strip() 
+all_data_otm_dense = pd.merge(displacement_data_otm_dense, geo_data_otm_dense, on='pid', how='left')
+
+displacement_data_otm_ml = load_displacement_data('final_otm.csv', 
+                                                      'Descending 22')
+displacement_data_otm_ml['pid'] = displacement_data_otm_ml['pid'].astype(str).str.strip() 
+all_data_otm_ml = pd.merge(displacement_data_otm_ml, geo_data_otm_ml, on='pid', how='left')
+
 prediction_data_1 = pd.read_csv('predictions_values.csv')
 prediction_data_1 = prediction_data_1.melt(var_name='pid', 
                                            value_name='predicted_displacement')
@@ -249,36 +239,6 @@ prediction_data_4['label'] = 'Prediction Set 4'
 prediction_data_4['step'] = prediction_data_4.groupby('pid').cumcount()
 
 all_prediction_data_wroclaw = pd.concat([prediction_data_1, prediction_data_2, prediction_data_3, prediction_data_4], ignore_index=True)
-
-prediction_data_grunwald = pd.read_csv('predictions_grunwald_auto.csv', delimiter=',')
-prediction_data_grunwald = prediction_data_grunwald.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_grunwald['label'] = 'Grunwald Prediction Set'
-prediction_data_grunwald['step'] = prediction_data_grunwald.groupby('pid').cumcount()
-
-prediction_data_grunwald_lstm = pd.read_csv('predictions_grunwald.csv', delimiter=',')
-prediction_data_grunwald_lstm = prediction_data_grunwald_lstm.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_grunwald_lstm['label'] = 'LSTM Grunwald Prediction Set'
-prediction_data_grunwald_lstm['step'] = prediction_data_grunwald_lstm.groupby('pid').cumcount()
-
-prediction_data_bedzin_conv = pd.read_csv('predictions_bedzin_conv.csv', delimiter=',')
-prediction_data_bedzin_conv = prediction_data_bedzin_conv.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_bedzin_conv['label'] = 'CONV Bedzin Prediction Set'
-prediction_data_bedzin_conv['step'] = prediction_data_bedzin_conv.groupby('pid').cumcount()
-
-prediction_data_bedzin_lstm = pd.read_csv('predictions_bedzin_lstm.csv', delimiter=',')
-prediction_data_bedzin_lstm = prediction_data_bedzin_lstm.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_bedzin_lstm['label'] = 'LSTM Bedzin Prediction Set'
-prediction_data_bedzin_lstm['step'] = prediction_data_bedzin_lstm.groupby('pid').cumcount()
-
-prediction_data_bedzin_dense = pd.read_csv('predictions_bedzin_dense.csv', delimiter=',')
-prediction_data_bedzin_dense = prediction_data_bedzin_dense.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_bedzin_dense['label'] = 'DENSE Bedzin Prediction Set'
-prediction_data_bedzin_dense['step'] = prediction_data_bedzin_dense.groupby('pid').cumcount()
-
-prediction_data_bedzin_ml = pd.read_csv('predictions_bedzin_ml.csv', delimiter=',')
-prediction_data_bedzin_ml = prediction_data_bedzin_ml.melt(var_name='pid', value_name='predicted_displacement')
-prediction_data_bedzin_ml['label'] = 'ML Bedzin Prediction Set'
-prediction_data_bedzin_ml['step'] = prediction_data_bedzin_ml.groupby('pid').cumcount()
 
 prediction_data_zapora_conv = pd.read_csv('predictions_zapora_conv.csv', delimiter=',')
 prediction_data_zapora_conv = prediction_data_zapora_conv.melt(var_name='pid', value_name='predicted_displacement')
@@ -360,6 +320,26 @@ prediction_data_nysa_ml = prediction_data_nysa_ml.melt(var_name='pid', value_nam
 prediction_data_nysa_ml['label'] = 'ML Nysa Prediction Set'
 prediction_data_nysa_ml['step'] = prediction_data_nysa_ml.groupby('pid').cumcount()
 
+prediction_data_otm_conv = pd.read_csv('predictions_otm_conv.csv', delimiter=',')
+prediction_data_otm_conv = prediction_data_otm_conv.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_otm_conv['label'] = 'CONV OTM Prediction Set'
+prediction_data_otm_conv['step'] = prediction_data_otm_conv.groupby('pid').cumcount()
+
+prediction_data_otm_lstm = pd.read_csv('predictions_otm_lstm.csv', delimiter=',')
+prediction_data_otm_lstm = prediction_data_otm_lstm.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_otm_lstm['label'] = 'LSTM OTM Prediction Set'
+prediction_data_otm_lstm['step'] = prediction_data_otm_lstm.groupby('pid').cumcount()
+
+prediction_data_otm_dense = pd.read_csv('predictions_otm_dense.csv', delimiter=',')
+prediction_data_otm_dense = prediction_data_otm_dense.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_otm_dense['label'] = 'DENSE OTM Prediction Set'
+prediction_data_otm_dense['step'] = prediction_data_otm_dense.groupby('pid').cumcount()
+
+prediction_data_otm_ml = pd.read_csv('predictions_otm_ml.csv', delimiter=',')
+prediction_data_otm_ml = prediction_data_otm_ml.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_otm_ml['label'] = 'ML OTM Prediction Set'
+prediction_data_otm_ml['step'] = prediction_data_otm_ml.groupby('pid').cumcount()
+
 anomaly_data_1_95 = load_anomaly_data('anomaly_output_95.csv', 'Anomaly Set 1 (95%)')
 anomaly_data_2_95 = load_anomaly_data('anomaly_output2_95.csv', 'Anomaly Set 2 (95%)')
 anomaly_data_3_95 = load_anomaly_data('anomaly_output3_95.csv', 'Anomaly Set 3 (95%)')
@@ -373,42 +353,6 @@ anomaly_data_3_99 = load_anomaly_data('anomaly_output3_99.csv', 'Anomaly Set 3 (
 anomaly_data_4_99 = load_anomaly_data('anomaly_output4_99.csv', 'Anomaly Set 4 (99%)')
 
 all_anomaly_data_99_wroclaw = pd.concat([anomaly_data_1_99, anomaly_data_2_99, anomaly_data_3_99, anomaly_data_4_99], ignore_index=True)
-
-anomaly_data_grunwald_95 = load_anomaly_data('anomaly_grunwald_auto_95.csv', 'Anomaly Set 6 LSTM (95%)')
-anomaly_data_grunwald_95 = anomaly_data_grunwald_95.groupby('pid').head(61)
-
-anomaly_data_grunwald_99 = load_anomaly_data('anomaly_grunwald_auto_99.csv', 'Anomaly Set 6 LSTM (99%)')
-anomaly_data_grunwald_99 = anomaly_data_grunwald_99.groupby('pid').head(61)
-
-anomaly_data_grunwald_95_lstm = load_anomaly_data('anomaly_grunwald_95.csv', 'Anomaly Set 6 LSTM (95%)')
-anomaly_data_grunwald_95_lstm = anomaly_data_grunwald_95_lstm.groupby('pid').head(61)
-
-anomaly_data_grunwald_99_lstm = load_anomaly_data('anomaly_grunwald_99.csv', 'Anomaly Set 6 LSTM (99%)')
-anomaly_data_grunwald_99_lstm = anomaly_data_grunwald_99_lstm.groupby('pid').head(61)
-
-anomaly_data_bedzin_95_lstm = load_anomaly_data('anomaly_bedzin_lstm_95.csv', 'Anomaly Set 7 LSTM (95%)')
-anomaly_data_bedzin_95_lstm = anomaly_data_bedzin_95_lstm.groupby('pid').head(11)
-
-anomaly_data_bedzin_99_lstm = load_anomaly_data('anomaly_bedzin_lstm_99.csv', 'Anomaly Set 7 LSTM (99%)')
-anomaly_data_bedzin_99_lstm = anomaly_data_bedzin_99_lstm.groupby('pid').head(11)
-
-anomaly_data_bedzin_95_conv = load_anomaly_data('anomaly_bedzin_conv_95.csv', 'Anomaly Set 7 CONV (95%)')
-anomaly_data_bedzin_95_conv = anomaly_data_bedzin_95_conv.groupby('pid').head(11)
-
-anomaly_data_bedzin_99_conv = load_anomaly_data('anomaly_bedzin_conv_99.csv', 'Anomaly Set 7 CONV (99%)')
-anomaly_data_bedzin_99_conv = anomaly_data_bedzin_99_conv.groupby('pid').head(11)
-
-anomaly_data_bedzin_95_dense = load_anomaly_data('anomaly_bedzin_dense_95.csv', 'Anomaly Set 7 DENSE (95%)')
-anomaly_data_bedzin_95_dense = anomaly_data_bedzin_95_dense.groupby('pid').head(11)
-
-anomaly_data_bedzin_99_dense = load_anomaly_data('anomaly_bedzin_dense_99.csv', 'Anomaly Set 7 DENSE (99%)')
-anomaly_data_bedzin_99_dense = anomaly_data_bedzin_99_dense.groupby('pid').head(11)
-
-anomaly_data_bedzin_95_ml = load_anomaly_data('anomaly_bedzin_ml_95.csv', 'Anomaly Set 7 ML (95%)')
-anomaly_data_bedzin_95_ml = anomaly_data_bedzin_95_ml.groupby('pid').head(11)
-
-anomaly_data_bedzin_99_ml = load_anomaly_data('anomaly_bedzin_ml_99.csv', 'Anomaly Set 7 ML (99%)')
-anomaly_data_bedzin_99_ml = anomaly_data_bedzin_99_ml.groupby('pid').head(11)
 
 anomaly_data_zapora_95_lstm = load_anomaly_data('anomaly_zapora_lstm_95.csv', 'Anomaly Set 8 LSTM (95%)')
 anomaly_data_zapora_95_lstm = anomaly_data_zapora_95_lstm.groupby('pid').head(60)
@@ -497,7 +441,7 @@ anomaly_data_nysa_99_conv = anomaly_data_nysa_99_conv.groupby('pid').head(60)
 anomaly_data_nysa_95_dense = load_anomaly_data('anomaly_nysa_dense_95.csv', 'Anomaly Set 11 DENSE (95%)')
 anomaly_data_nysa_95_dense = anomaly_data_nysa_95_dense.groupby('pid').head(60)
 
-anomaly_data_nysa_99_dense = load_anomaly_data('anomaly_nysa_dense_99.csv', 'Anomaly Set 10 DENSE (99%)')
+anomaly_data_nysa_99_dense = load_anomaly_data('anomaly_nysa_dense_99.csv', 'Anomaly Set 11 DENSE (99%)')
 anomaly_data_nysa_99_dense = anomaly_data_nysa_99_dense.groupby('pid').head(60)
 
 anomaly_data_nysa_95_ml = load_anomaly_data('anomaly_nysa_ml_95.csv', 'Anomaly Set 11 ML (95%)')
@@ -505,6 +449,30 @@ anomaly_data_nysa_95_ml = anomaly_data_nysa_95_ml.groupby('pid').head(60)
 
 anomaly_data_nysa_99_ml = load_anomaly_data('anomaly_nysa_ml_99.csv', 'Anomaly Set 11 ML (99%)')
 anomaly_data_nysa_99_ml = anomaly_data_nysa_99_ml.groupby('pid').head(60)
+
+anomaly_data_otm_95_lstm = load_anomaly_data('anomaly_otm_lstm_95.csv', 'Anomaly Set 12 LSTM (95%)')
+anomaly_data_otm_95_lstm = anomaly_data_otm_95_lstm.groupby('pid').head(60)
+
+anomaly_data_otm_99_lstm = load_anomaly_data('anomaly_otm_lstm_99.csv', 'Anomaly Set 12 LSTM (99%)')
+anomaly_data_otm_99_lstm = anomaly_data_otm_99_lstm.groupby('pid').head(60)
+
+anomaly_data_otm_95_conv = load_anomaly_data('anomaly_otm_conv_95.csv', 'Anomaly Set 12 CONV (95%)')
+anomaly_data_otm_95_conv = anomaly_data_otm_95_conv.groupby('pid').head(60)
+
+anomaly_data_otm_99_conv = load_anomaly_data('anomaly_otm_conv_99.csv', 'Anomaly Set 12 CONV (99%)')
+anomaly_data_otm_99_conv = anomaly_data_otm_99_conv.groupby('pid').head(60)
+
+anomaly_data_otm_95_dense = load_anomaly_data('anomaly_otm_dense_95.csv', 'Anomaly Set 12 DENSE (95%)')
+anomaly_data_otm_95_dense = anomaly_data_otm_95_dense.groupby('pid').head(60)
+
+anomaly_data_otm_99_dense = load_anomaly_data('anomaly_otm_dense_99.csv', 'Anomaly Set 12 DENSE (99%)')
+anomaly_data_otm_99_dense = anomaly_data_otm_99_dense.groupby('pid').head(60)
+
+anomaly_data_otm_95_ml = load_anomaly_data('anomaly_otm_ml_95.csv', 'Anomaly Set 12 ML (95%)')
+anomaly_data_otm_95_ml = anomaly_data_otm_95_ml.groupby('pid').head(60)
+
+anomaly_data_otm_99_ml = load_anomaly_data('anomaly_otm_ml_99.csv', 'Anomaly Set 12 ML (99%)')
+anomaly_data_otm_99_ml = anomaly_data_otm_99_ml.groupby('pid').head(60)
 
 all_data_wroclaw.sort_values(by=['pid', 'timestamp'], inplace=True)
 all_data_wroclaw['displacement_diff'] = all_data_wroclaw.groupby('pid')['displacement'].diff().round(1)
@@ -514,60 +482,6 @@ all_data_wroclaw['displacement_speed'] = ((all_data_wroclaw['displacement_diff']
 mean_velocity_data_wroclaw = all_data_wroclaw.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
 mean_velocity_data_wroclaw.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
 all_data_wroclaw = pd.merge(all_data_wroclaw, mean_velocity_data_wroclaw, on='pid', how='left')
-
-all_data_grunwald.sort_values(by=['pid', 'timestamp'], inplace=True)
-all_data_grunwald['displacement_diff'] = all_data_grunwald.groupby('pid')['displacement'].diff().round(1)
-all_data_grunwald['time_diff'] = all_data_grunwald.groupby('pid')['timestamp'].diff().dt.days.round(1)
-all_data_grunwald['displacement_speed'] = ((all_data_grunwald['displacement_diff'] / all_data_grunwald['time_diff']) * 365).round(1)
-
-mean_velocity_data_grunwald = all_data_grunwald.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
-mean_velocity_data_grunwald.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
-all_data_grunwald = pd.merge(all_data_grunwald, mean_velocity_data_grunwald, on='pid', how='left')
-
-all_data_grunwald_lstm.sort_values(by=['pid', 'timestamp'], inplace=True)
-all_data_grunwald_lstm['displacement_diff'] = all_data_grunwald_lstm.groupby('pid')['displacement'].diff().round(1)
-all_data_grunwald_lstm['time_diff'] = all_data_grunwald_lstm.groupby('pid')['timestamp'].diff().dt.days.round(1)
-all_data_grunwald_lstm['displacement_speed'] = ((all_data_grunwald_lstm['displacement_diff'] / all_data_grunwald_lstm['time_diff']) * 365).round(1)
-
-mean_velocity_data_grunwald_lstm = all_data_grunwald_lstm.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
-mean_velocity_data_grunwald_lstm.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
-all_data_grunwald_lstm = pd.merge(all_data_grunwald_lstm, mean_velocity_data_grunwald_lstm, on='pid', how='left')
-
-all_data_bedzin_lstm.sort_values(by=['pid', 'timestamp'], inplace=True)
-all_data_bedzin_lstm['displacement_diff'] = all_data_bedzin_lstm.groupby('pid')['displacement'].diff().round(1)
-all_data_bedzin_lstm['time_diff'] = all_data_bedzin_lstm.groupby('pid')['timestamp'].diff().dt.days.round(1)
-all_data_bedzin_lstm['displacement_speed'] = ((all_data_bedzin_lstm['displacement_diff'] / all_data_bedzin_lstm['time_diff']) * 365).round(1)
-
-mean_velocity_data_bedzin_lstm = all_data_bedzin_lstm.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
-mean_velocity_data_bedzin_lstm.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
-all_data_bedzin_lstm = pd.merge(all_data_bedzin_lstm, mean_velocity_data_bedzin_lstm, on='pid', how='left')
-
-all_data_bedzin_conv.sort_values(by=['pid', 'timestamp'], inplace=True)
-all_data_bedzin_conv['displacement_diff'] = all_data_bedzin_conv.groupby('pid')['displacement'].diff().round(1)
-all_data_bedzin_conv['time_diff'] = all_data_bedzin_conv.groupby('pid')['timestamp'].diff().dt.days.round(1)
-all_data_bedzin_conv['displacement_speed'] = ((all_data_bedzin_conv['displacement_diff'] / all_data_bedzin_conv['time_diff']) * 365).round(1)
-
-mean_velocity_data_bedzin_conv = all_data_bedzin_conv.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
-mean_velocity_data_bedzin_conv.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
-all_data_bedzin_conv = pd.merge(all_data_bedzin_conv, mean_velocity_data_bedzin_conv, on='pid', how='left')
-
-all_data_bedzin_dense.sort_values(by=['pid', 'timestamp'], inplace=True)
-all_data_bedzin_dense['displacement_diff'] = all_data_bedzin_dense.groupby('pid')['displacement'].diff().round(1)
-all_data_bedzin_dense['time_diff'] = all_data_bedzin_dense.groupby('pid')['timestamp'].diff().dt.days.round(1)
-all_data_bedzin_dense['displacement_speed'] = ((all_data_bedzin_dense['displacement_diff'] / all_data_bedzin_dense['time_diff']) * 365).round(1)
-
-mean_velocity_data_bedzin_dense = all_data_bedzin_dense.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
-mean_velocity_data_bedzin_dense.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
-all_data_bedzin_dense = pd.merge(all_data_bedzin_dense, mean_velocity_data_bedzin_dense, on='pid', how='left')
-
-all_data_bedzin_ml.sort_values(by=['pid', 'timestamp'], inplace=True)
-all_data_bedzin_ml['displacement_diff'] = all_data_bedzin_ml.groupby('pid')['displacement'].diff().round(1)
-all_data_bedzin_ml['time_diff'] = all_data_bedzin_ml.groupby('pid')['timestamp'].diff().dt.days.round(1)
-all_data_bedzin_ml['displacement_speed'] = ((all_data_bedzin_ml['displacement_diff'] / all_data_bedzin_ml['time_diff']) * 365).round(1)
-
-mean_velocity_data_bedzin_ml = all_data_bedzin_ml.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
-mean_velocity_data_bedzin_ml.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
-all_data_bedzin_ml = pd.merge(all_data_bedzin_ml, mean_velocity_data_bedzin_ml, on='pid', how='left')
 
 all_data_zapora_lstm.sort_values(by=['pid', 'timestamp'], inplace=True)
 all_data_zapora_lstm['displacement_diff'] = all_data_zapora_lstm.groupby('pid')['displacement'].diff().round(1)
@@ -713,6 +627,42 @@ mean_velocity_data_nysa_ml = all_data_nysa_ml.groupby('pid')['displacement_speed
 mean_velocity_data_nysa_ml.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
 all_data_nysa_ml = pd.merge(all_data_nysa_ml, mean_velocity_data_nysa_ml, on='pid', how='left')
 
+all_data_otm_lstm.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_otm_lstm['displacement_diff'] = all_data_otm_lstm.groupby('pid')['displacement'].diff().round(1)
+all_data_otm_lstm['time_diff'] = all_data_otm_lstm.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_otm_lstm['displacement_speed'] = ((all_data_otm_lstm['displacement_diff'] / all_data_otm_lstm['time_diff']) * 365).round(1)
+
+mean_velocity_data_otm_lstm = all_data_otm_lstm.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_otm_lstm.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_otm_lstm = pd.merge(all_data_otm_lstm, mean_velocity_data_otm_lstm, on='pid', how='left')
+
+all_data_otm_conv.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_otm_conv['displacement_diff'] = all_data_otm_conv.groupby('pid')['displacement'].diff().round(1)
+all_data_otm_conv['time_diff'] = all_data_otm_conv.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_otm_conv['displacement_speed'] = ((all_data_otm_conv['displacement_diff'] / all_data_otm_conv['time_diff']) * 365).round(1)
+
+mean_velocity_data_otm_conv = all_data_otm_conv.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_otm_conv.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_otm_conv = pd.merge(all_data_otm_conv, mean_velocity_data_otm_conv, on='pid', how='left')
+
+all_data_otm_dense.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_otm_dense['displacement_diff'] = all_data_otm_dense.groupby('pid')['displacement'].diff().round(1)
+all_data_otm_dense['time_diff'] = all_data_otm_dense.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_otm_dense['displacement_speed'] = ((all_data_otm_dense['displacement_diff'] / all_data_otm_dense['time_diff']) * 365).round(1)
+
+mean_velocity_data_otm_dense = all_data_otm_dense.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_otm_dense.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_otm_dense = pd.merge(all_data_otm_dense, mean_velocity_data_otm_dense, on='pid', how='left')
+
+all_data_otm_ml.sort_values(by=['pid', 'timestamp'], inplace=True)
+all_data_otm_ml['displacement_diff'] = all_data_otm_ml.groupby('pid')['displacement'].diff().round(1)
+all_data_otm_ml['time_diff'] = all_data_otm_ml.groupby('pid')['timestamp'].diff().dt.days.round(1)
+all_data_otm_ml['displacement_speed'] = ((all_data_otm_ml['displacement_diff'] / all_data_otm_ml['time_diff']) * 365).round(1)
+
+mean_velocity_data_otm_ml = all_data_otm_ml.groupby('pid')['displacement_speed'].mean().round(1).reset_index()
+mean_velocity_data_otm_ml.rename(columns={'displacement_speed': 'mean_velocity'}, inplace=True)
+all_data_otm_ml = pd.merge(all_data_otm_ml, mean_velocity_data_otm_ml, on='pid', how='left')
+
 def compute_prefix_sums(data):
     data = data.sort_values(by=['pid', 'step'])
     pivot = data.pivot(index='pid', columns='step', values='predicted_displacement').apply(pd.to_numeric, errors='coerce').fillna(0).round(1)
@@ -723,12 +673,6 @@ def compute_prefix_sums(data):
     return pivot
 
 wroclaw_prefix = compute_prefix_sums(all_prediction_data_wroclaw)
-grunwald_prefix = compute_prefix_sums(prediction_data_grunwald)
-grunwald_lstm_prefix = compute_prefix_sums(prediction_data_grunwald_lstm)
-bedzin_lstm_prefix = compute_prefix_sums(prediction_data_bedzin_lstm)
-bedzin_conv_prefix = compute_prefix_sums(prediction_data_bedzin_conv)
-bedzin_dense_prefix = compute_prefix_sums(prediction_data_bedzin_dense)
-bedzin_ml_prefix = compute_prefix_sums(prediction_data_bedzin_ml)
 zapora_lstm_prefix = compute_prefix_sums(prediction_data_zapora_lstm)
 zapora_conv_prefix = compute_prefix_sums(prediction_data_zapora_conv)
 zapora_dense_prefix = compute_prefix_sums(prediction_data_zapora_dense)
@@ -745,15 +689,13 @@ nysa_lstm_prefix = compute_prefix_sums(prediction_data_nysa_lstm)
 nysa_conv_prefix = compute_prefix_sums(prediction_data_nysa_conv)
 nysa_dense_prefix = compute_prefix_sums(prediction_data_nysa_dense)
 nysa_ml_prefix = compute_prefix_sums(prediction_data_nysa_ml)
+otm_lstm_prefix = compute_prefix_sums(prediction_data_otm_lstm)
+otm_conv_prefix = compute_prefix_sums(prediction_data_otm_conv)
+otm_dense_prefix = compute_prefix_sums(prediction_data_otm_dense)
+otm_ml_prefix = compute_prefix_sums(prediction_data_otm_ml)
 
 prefix_data = {
     ('wroclaw', 'dense'): wroclaw_prefix,
-    ('bedzin', 'lstm'): bedzin_lstm_prefix,
-    ('bedzin', 'conv'): bedzin_conv_prefix,
-    ('bedzin', 'dense'): bedzin_dense_prefix,
-    ('bedzin', 'ml'): bedzin_ml_prefix,
-    ('grunwald', 'dense'): grunwald_prefix,
-    ('grunwald', 'lstm'): grunwald_lstm_prefix,
     ('zapora', 'lstm'): zapora_lstm_prefix,
     ('zapora', 'conv'): zapora_conv_prefix,
     ('zapora', 'dense'): zapora_dense_prefix,
@@ -770,15 +712,18 @@ prefix_data = {
     ('nysa', 'conv'): nysa_conv_prefix,
     ('nysa', 'dense'): nysa_dense_prefix,
     ('nysa', 'ml'): nysa_ml_prefix,
+    ('otmuchow', 'lstm'): otm_lstm_prefix,
+    ('otmuchow', 'conv'): otm_conv_prefix,
+    ('otmuchow', 'dense'): otm_dense_prefix,
+    ('otmuchow', 'ml'): otm_ml_prefix,
 }
 
 MAX_WROCLAW = wroclaw_prefix.columns.max()
-MAX_BEDZIN = bedzin_dense_prefix.columns.max()
-MAX_GRUNWALD = grunwald_prefix.columns.max()
 MAX_ZAPORA = zapora_dense_prefix.columns.max()
 MAX_KOZIELNO = koz_dense_prefix.columns.max()
 MAX_TOPOLA = top_dense_prefix.columns.max()
 MAX_NYSA = nysa_dense_prefix.columns.max()
+MAX_OTMUCHOW = otm_dense_prefix.columns.max()
 
 def add_obs_step(df):
     df = df.sort_values(by=['pid', 'timestamp'])
@@ -786,12 +731,11 @@ def add_obs_step(df):
     return df
 
 all_data_wroclaw = add_obs_step(all_data_wroclaw)
-all_data_bedzin_dense = add_obs_step(all_data_bedzin_dense)
-all_data_grunwald = add_obs_step(all_data_grunwald)
 all_data_zapora_dense = add_obs_step(all_data_zapora_dense)
 all_data_koz_dense = add_obs_step(all_data_koz_dense)
 all_data_top_dense = add_obs_step(all_data_top_dense)
 all_data_nysa_dense = add_obs_step(all_data_nysa_dense)
+all_data_otm_dense = add_obs_step(all_data_otm_dense)
 
 def compute_prefix_sums_actual(df):
     pivot = df.pivot(index='pid', columns='obs_step', values='displacement').fillna(0).round(1)
@@ -802,30 +746,27 @@ def compute_prefix_sums_actual(df):
     return pivot
 
 actual_wroclaw_prefix = compute_prefix_sums_actual(all_data_wroclaw)
-actual_bedzin_dense_prefix = compute_prefix_sums_actual(all_data_bedzin_dense)
-actual_grunwald_prefix = compute_prefix_sums_actual(all_data_grunwald)
 actual_zapora_dense_prefix = compute_prefix_sums_actual(all_data_zapora_dense)
 actual_koz_dense_prefix = compute_prefix_sums_actual(all_data_koz_dense)
 actual_top_dense_prefix = compute_prefix_sums_actual(all_data_top_dense)
 actual_nysa_dense_prefix = compute_prefix_sums_actual(all_data_nysa_dense)
+actual_otm_dense_prefix = compute_prefix_sums_actual(all_data_otm_dense)
 
 actual_prefix_data = {
     'wroclaw': actual_wroclaw_prefix,
-    'bedzin': actual_bedzin_dense_prefix,
     'zapora': actual_zapora_dense_prefix,
-    'grunwald': actual_grunwald_prefix,
     'kozielno': actual_koz_dense_prefix,
     'topola': actual_top_dense_prefix,
     'nysa': actual_nysa_dense_prefix,
+    'otmuchow': actual_otm_dense_prefix,
 }
 
 MAX_ACTUAL_WROCLAW = actual_wroclaw_prefix.columns.max()
-MAX_ACTUAL_BEDZIN = actual_bedzin_dense_prefix.columns.max()
-MAX_ACTUAL_GRUNWALD = actual_grunwald_prefix.columns.max()
 MAX_ACTUAL_ZAPORA = actual_zapora_dense_prefix.columns.max()
 MAX_ACTUAL_KOZIELNO = actual_koz_dense_prefix.columns.max()
 MAX_ACTUAL_TOPOLA = actual_top_dense_prefix.columns.max()
 MAX_ACTUAL_NYSA = actual_nysa_dense_prefix.columns.max()
+MAX_ACTUAL_OTMUCHOW = actual_otm_dense_prefix.columns.max()
 
 px.set_mapbox_access_token('pk.eyJ1IjoibnBpZWsiLCJhIjoiY203bG5vZm9hMGRkMDJscjB0cG44OWFoOCJ9.HrzUxjpcUzYd9LiYuoVWnw')
 
@@ -1025,12 +966,11 @@ app.layout = html.Div([
                 id='area-dropdown',
                 options=[
                     {'label': 'Mosty - Wrocław', 'value': 'wroclaw'},
+                    {'label': 'Zapora Świnna Poręba', 'value': 'zapora'},
                     {'label': 'Jezioro Nyskie', 'value': 'nysa'},
+                    {'label': 'Jezioro Otmuchowskie', 'value': 'otmuchow'},
                     {'label': 'Zbiornik Kozielno', 'value': 'kozielno'},
                     {'label': 'Zbiornik Topola', 'value': 'topola'},
-                    {'label': 'Zapora Świnna Poręba', 'value': 'zapora'},
-                    {'label': 'Plac Grunwaldzki - Wrocław', 'value': 'grunwald'},
-                    {'label': 'Będzin', 'value': 'bedzin'},
                 ],
                 value='wroclaw',
                 clearable=False,
@@ -1219,9 +1159,8 @@ def display_selected_dates(range_value, selected_area):
         'kozielno': all_data_koz_dense,
         'topola': all_data_top_dense,
         'nysa': all_data_nysa_dense,
-        'bedzin': all_data_bedzin_dense,
+        'otmuchow': all_data_otm_dense,
         'zapora': all_data_zapora_dense,
-        'grunwald': all_data_grunwald
     }.get(selected_area, all_data_wroclaw)
 
     timestamps_df = (
@@ -1266,11 +1205,9 @@ def toggle_prediction_method_dropdown(selected_area):
         return {'display': 'block', 'padding': '10px'}
     elif selected_area == 'topola':
         return {'display': 'block', 'padding': '10px'}
+    elif selected_area == 'otmuchow':
+        return {'display': 'block', 'padding': '10px'}
     elif selected_area == 'nysa':
-        return {'display': 'block', 'padding': '10px'}
-    elif selected_area == 'grunwald':
-        return {'display': 'block', 'padding': '10px'}
-    elif selected_area == 'bedzin':
         return {'display': 'block', 'padding': '10px'}
     elif selected_area == 'zapora':
         return {'display': 'block', 'padding': '10px'}
@@ -1290,10 +1227,8 @@ def update_orbit_filter(selected_area):
         return [{'label': 'Descending 22', 'value': 'Descending 22'}], 'Ascending 22', True
     elif selected_area == 'nysa':
         return [{'label': 'Descending 22', 'value': 'Descending 22'}], 'Ascending 22', True
-    elif selected_area == 'bedzin':
-        return [{'label': 'Ascending 175', 'value': 'Ascending 175'}], 'Ascending 175', True
-    elif selected_area == 'grunwald':
-        return [{'label': 'Ascending 175', 'value': 'Ascending 175'}], 'Ascending 175', True
+    elif selected_area == 'otmuchow':
+        return [{'label': 'Descending 22', 'value': 'Descending 22'}], 'Ascending 22', True
     elif selected_area == 'zapora':
         return [{'label': 'Descending 51', 'value': 'Descending 51'}], 'Ascending 175', True
     else:
@@ -1315,9 +1250,8 @@ def update_slider_max(selected_area, color_mode, prediction_method):
             'kozielno': MAX_ACTUAL_KOZIELNO,
             'topola': MAX_ACTUAL_TOPOLA,
             'nysa': MAX_ACTUAL_NYSA,
-            'bedzin': MAX_ACTUAL_BEDZIN,
+            'otmuchow': MAX_ACTUAL_OTMUCHOW,
             'zapora': MAX_ACTUAL_ZAPORA,
-            'grunwald': MAX_ACTUAL_GRUNWALD
         }.get(selected_area, MAX_ACTUAL_WROCLAW)
     else:
         max_val = 60  
@@ -1326,10 +1260,9 @@ def update_slider_max(selected_area, color_mode, prediction_method):
         'wroclaw': all_data_wroclaw,
         'kozielno': all_data_koz_dense,
         'nysa': all_data_nysa_dense,
+        'otmuchow': all_data_otm_dense,
         'topola': all_data_top_dense,
-        'bedzin': all_data_bedzin_dense,
         'zapora': all_data_zapora_dense,
-        'grunwald': all_data_grunwald
     }.get(selected_area, all_data_wroclaw)
 
     timestamps_df = data_for_area.drop_duplicates(subset='obs_step')[['obs_step', 'timestamp']].sort_values('obs_step')
@@ -1387,26 +1320,21 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         center_coords = {'lat': data['latitude'].mean(), 'lon': data['longitude'].mean()}
         zoom_level = 12
         orbit_filter = ['Descending 22']
+    elif selected_area == 'otmuchow':
+        data = all_data_otm_dense.drop_duplicates(subset=['pid'])
+        center_coords = {'lat': data['latitude'].mean(), 'lon': data['longitude'].mean()}
+        zoom_level = 12
+        orbit_filter = ['Descending 22']
     elif selected_area == 'nysa':
         data = all_data_nysa_dense.drop_duplicates(subset=['pid'])
         center_coords = {'lat': data['latitude'].mean(), 'lon': data['longitude'].mean()}
         zoom_level = 12
         orbit_filter = ['Descending 22']
-    elif selected_area == 'grunwald':
-        data = all_data_grunwald.drop_duplicates(subset=['pid'])
-        center_coords = {'lat': 51.11249671461431, 'lon': 17.06133312265709}
-        zoom_level = 14
-        orbit_filter = ['Ascending 175']
-    elif selected_area == 'zapora':
+    else:
         data = all_data_zapora_dense.drop_duplicates(subset=['pid'])
         center_coords = {'lat': data['latitude'].mean(), 'lon': data['longitude'].mean()}
         zoom_level = 14
         orbit_filter = ['Descending 51']
-    else:  
-        data = all_data_bedzin_dense.drop_duplicates(subset=['pid'])
-        center_coords = {'lat': data['latitude'].mean(), 'lon': data['longitude'].mean()}
-        zoom_level = 14.5
-        orbit_filter = ['Ascending 175']
 
     if isinstance(orbit_filter, str):
         orbit_filter = [orbit_filter]
@@ -1423,18 +1351,16 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
             max_steps = MAX_KOZIELNO
         elif selected_area == 'topola':
             max_steps = MAX_TOPOLA
+        elif selected_area == 'otmuchow':
+            max_steps = MAX_OTMUCHOW
         elif selected_area == 'nysa':
             max_steps = MAX_NYSA
-        elif selected_area == 'bedzin':
-            max_steps = MAX_BEDZIN
-        elif selected_area == 'grunwald':
-            max_steps = MAX_GRUNWALD
         elif selected_area == 'zapora':
             max_steps = MAX_ZAPORA
         else:
             max_steps = MAX_WROCLAW
 
-        pred_key = (selected_area, prediction_method if selected_area in ['grunwald', 'nysa', 'bedzin', 'zapora', 'topola', 'kozielno'] else 'dense')
+        pred_key = (selected_area, prediction_method if selected_area in ['turow', 'grunwald', 'nysa', 'bedzin', 'zapora', 'topola', 'kozielno'] else 'dense')
         prefix_pivot = prefix_data[pred_key]
 
         end_val = min(end_val, max_steps)
@@ -1483,12 +1409,9 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         elif selected_area == 'nysa':
             max_steps = MAX_ACTUAL_NYSA
             prefix_pivot = actual_prefix_data['nysa']
-        elif selected_area == 'bedzin':
-            max_steps = MAX_ACTUAL_BEDZIN
-            prefix_pivot = actual_prefix_data['bedzin']
-        elif selected_area == 'grunwald':
-            max_steps = MAX_ACTUAL_GRUNWALD
-            prefix_pivot = actual_prefix_data['grunwald']
+        elif selected_area == 'otmuchow':
+            max_steps = MAX_ACTUAL_OTMUCHOW
+            prefix_pivot = actual_prefix_data['otmuchow']
         elif selected_area == 'zapora':
             max_steps = MAX_ACTUAL_ZAPORA
             prefix_pivot = actual_prefix_data['zapora']
@@ -1537,16 +1460,14 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
             merged_data = filtered_data.merge(all_anomaly_data_99_wroclaw[['pid','is_anomaly']], on='pid', how='left')
         elif selected_area == 'kozielno':
             merged_data = filtered_data.merge(anomaly_data_koz_99_dense[['pid','is_anomaly']], on='pid', how='left')
+        elif selected_area == 'otmuchow':
+            merged_data = filtered_data.merge(anomaly_data_otm_99_dense[['pid','is_anomaly']], on='pid', how='left')
         elif selected_area == 'nysa':
             merged_data = filtered_data.merge(anomaly_data_nysa_99_dense[['pid','is_anomaly']], on='pid', how='left')
         elif selected_area == 'topola':
             merged_data = filtered_data.merge(anomaly_data_top_99_dense[['pid','is_anomaly']], on='pid', how='left')
-        elif selected_area == 'grunwald':
-            merged_data = filtered_data.merge(anomaly_data_grunwald_99[['pid','is_anomaly']], on='pid', how='left')
-        elif selected_area == 'zapora':
-            merged_data = filtered_data.merge(anomaly_data_zapora_99_dense[['pid','is_anomaly']], on='pid', how='left')
         else:
-            merged_data = filtered_data.merge(anomaly_data_bedzin_99_dense[['pid','is_anomaly']], on='pid', how='left')
+            merged_data = filtered_data.merge(anomaly_data_zapora_99_dense[['pid','is_anomaly']], on='pid', how='left')
 
         merged_data['is_anomaly'] = merged_data['is_anomaly'].fillna(False).astype(bool)
         merged_data['consecutive_anomalies'] = (
@@ -1701,15 +1622,12 @@ def update_date_picker(selected_area):
     if selected_area == 'wroclaw':
         start_date = all_data_wroclaw['timestamp'].min()
         end_date = all_data_wroclaw['timestamp'].max()
-    elif selected_area == 'bedzin':
-        start_date = all_data_bedzin_dense['timestamp'].min()
-        end_date = all_data_bedzin_dense['timestamp'].max()
-    elif selected_area == 'grunwald':
-        start_date = all_data_grunwald['timestamp'].min()
-        end_date = all_data_grunwald['timestamp'].max()
     elif selected_area == 'zapora':
         start_date = all_data_zapora_dense['timestamp'].min()
         end_date = all_data_zapora_dense['timestamp'].max()
+    elif selected_area == 'otmuchow':
+        start_date = all_data_otm_dense['timestamp'].min()
+        end_date = all_data_otm_dense['timestamp'].max()
     elif selected_area == 'topola':
         start_date = all_data_top_dense['timestamp'].min()
         end_date = all_data_top_dense['timestamp'].max()
@@ -1745,38 +1663,6 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
         anomaly_data_95 = all_anomaly_data_95_wroclaw
         anomaly_data_99 = all_anomaly_data_99_wroclaw
         last_n_data = full_data.tail(60)
-    elif selected_area == 'grunwald':
-        if prediction_method == 'dense':
-            full_data = all_data_grunwald[all_data_grunwald['pid'] == point_id].copy()
-            anomaly_data_95 = anomaly_data_grunwald_95
-            anomaly_data_99 = anomaly_data_grunwald_99
-            last_n_data = full_data.tail(31)
-        elif prediction_method == 'lstm':
-            full_data = all_data_grunwald_lstm[all_data_grunwald_lstm['pid'] == point_id].copy()
-            anomaly_data_95 = anomaly_data_grunwald_95_lstm
-            anomaly_data_99 = anomaly_data_grunwald_99_lstm
-            last_n_data = full_data.tail(31)
-    elif selected_area == 'bedzin':
-        if prediction_method == 'dense':
-            full_data = all_data_bedzin_dense[all_data_bedzin_dense['pid'] == point_id].copy()
-            anomaly_data_95 = anomaly_data_bedzin_95_dense
-            anomaly_data_99 = anomaly_data_bedzin_99_dense
-            last_n_data = full_data.tail(11)
-        elif prediction_method == 'lstm':
-            full_data = all_data_bedzin_lstm[all_data_bedzin_lstm['pid'] == point_id].copy()
-            anomaly_data_95 = anomaly_data_bedzin_95_lstm
-            anomaly_data_99 = anomaly_data_bedzin_99_lstm
-            last_n_data = full_data.tail(11)
-        elif prediction_method == 'conv':
-            full_data = all_data_bedzin_conv[all_data_bedzin_conv['pid'] == point_id].copy()
-            anomaly_data_95 = anomaly_data_bedzin_95_conv
-            anomaly_data_99 = anomaly_data_bedzin_99_conv
-            last_n_data = full_data.tail(11)
-        else:
-            full_data = all_data_bedzin_ml[all_data_bedzin_ml['pid'] == point_id].copy()
-            anomaly_data_95 = anomaly_data_bedzin_95_ml
-            anomaly_data_99 = anomaly_data_bedzin_99_ml
-            last_n_data = full_data.tail(11)
     elif selected_area == 'zapora':
         if prediction_method == 'dense':
             full_data = all_data_zapora_dense[all_data_zapora_dense['pid'] == point_id].copy()
@@ -1818,6 +1704,27 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
             full_data = all_data_top_ml[all_data_top_ml['pid'] == point_id].copy()
             anomaly_data_95 = anomaly_data_top_95_ml
             anomaly_data_99 = anomaly_data_top_99_ml
+            last_n_data = full_data.tail(60)
+    elif selected_area == 'otmuchow':
+        if prediction_method == 'dense':
+            full_data = all_data_otm_dense[all_data_otm_dense['pid'] == point_id].copy()
+            anomaly_data_95 = anomaly_data_otm_95_dense
+            anomaly_data_99 = anomaly_data_otm_99_dense
+            last_n_data = full_data.tail(60)
+        elif prediction_method == 'lstm':
+            full_data = all_data_otm_lstm[all_data_otm_lstm['pid'] == point_id].copy()
+            anomaly_data_95 = anomaly_data_otm_95_lstm
+            anomaly_data_99 = anomaly_data_otm_99_lstm
+            last_n_data = full_data.tail(60)
+        elif prediction_method == 'conv':
+            full_data = all_data_otm_conv[all_data_otm_conv['pid'] == point_id].copy()
+            anomaly_data_95 = anomaly_data_otm_95_conv
+            anomaly_data_99 = anomaly_data_otm_99_conv
+            last_n_data = full_data.tail(60)
+        else:
+            full_data = all_data_otm_ml[all_data_otm_ml['pid'] == point_id].copy()
+            anomaly_data_95 = anomaly_data_otm_95_ml
+            anomaly_data_99 = anomaly_data_otm_99_ml
             last_n_data = full_data.tail(60)
     elif selected_area == 'nysa':
         if prediction_method == 'dense':
