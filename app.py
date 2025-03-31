@@ -707,7 +707,7 @@ prefix_data = {
     ('topola', 'lstm'): top_lstm_prefix,
     ('topola', 'conv'): top_conv_prefix,
     ('topola', 'dense'): top_dense_prefix,
-    ('topola', 'ml'): nysa_ml_prefix,
+    ('topola', 'ml'): top_ml_prefix,
     ('nysa', 'lstm'): nysa_lstm_prefix,
     ('nysa', 'conv'): nysa_conv_prefix,
     ('nysa', 'dense'): nysa_dense_prefix,
@@ -1360,7 +1360,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         else:
             max_steps = MAX_WROCLAW
 
-        pred_key = (selected_area, prediction_method if selected_area in ['turow', 'grunwald', 'nysa', 'bedzin', 'zapora', 'topola', 'kozielno'] else 'dense')
+        pred_key = (selected_area, prediction_method if selected_area in ['nysa', 'otmuchow', 'zapora', 'topola', 'kozielno'] else 'dense')
         prefix_pivot = prefix_data[pred_key]
 
         end_val = min(end_val, max_steps)
@@ -1759,7 +1759,7 @@ def display_displacement(clickData, start_date, end_date, y_min, y_max, selected
             anomaly_data_99 = anomaly_data_koz_99_lstm
             last_n_data = full_data.tail(60)
         elif prediction_method == 'conv':
-            full_data = all_data_zapora_conv[all_data_koz_conv['pid'] == point_id].copy()
+            full_data = all_data_koz_conv[all_data_koz_conv['pid'] == point_id].copy()
             anomaly_data_95 = anomaly_data_koz_95_conv
             anomaly_data_99 = anomaly_data_koz_99_conv
             last_n_data = full_data.tail(60)
