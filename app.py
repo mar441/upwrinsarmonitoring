@@ -1286,9 +1286,9 @@ def toggle_prediction_method_dropdown(selected_area):
 def update_orbit_filter(selected_area):
     if selected_area == 'kozielno':
         return [{'label': 'Descending 22', 'value': 'Descending 22'}], 'Ascending 22', True
-    if selected_area == 'topola':
+    elif selected_area == 'topola':
         return [{'label': 'Descending 22', 'value': 'Descending 22'}], 'Ascending 22', True
-    if selected_area == 'nysa':
+    elif selected_area == 'nysa':
         return [{'label': 'Descending 22', 'value': 'Descending 22'}], 'Ascending 22', True
     elif selected_area == 'bedzin':
         return [{'label': 'Ascending 175', 'value': 'Ascending 175'}], 'Ascending 175', True
