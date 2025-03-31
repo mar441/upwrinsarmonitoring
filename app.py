@@ -55,8 +55,10 @@ displacement_data_2 = load_displacement_data('mz4_3.csv', 'Ascending 175')
 displacement_data_3 = load_displacement_data('msz4_3.csv', 'Descending 124')
 displacement_data_4 = load_displacement_data('msz2_3.csv', 'Ascending 175')
 
-for df in [displacement_data_1, displacement_data_2, displacement_data_3, displacement_data_4]:
-    df['pid'] = df['pid'].astype(str).str.strip()
+displacement_data_1['pid'] = displacement_data_1['pid'].astype(str).str.strip()
+displacement_data_2['pid'] = displacement_data_2['pid'].astype(str).str.strip()
+displacement_data_3['pid'] = displacement_data_3['pid'].astype(str).str.strip()
+displacement_data_4['pid'] = displacement_data_4['pid'].astype(str).str.strip()
 
 all_data_1 = pd.merge(displacement_data_1, geo_data_wroclaw, on='pid', how='left')
 all_data_2 = pd.merge(displacement_data_2, geo_data_wroclaw, on='pid', how='left')
@@ -65,43 +67,52 @@ all_data_4 = pd.merge(displacement_data_4, geo_data_wroclaw, on='pid', how='left
 
 all_data_wroclaw = pd.concat([all_data_1, all_data_2, all_data_3, all_data_4], ignore_index=True)
 
-displacement_data_zapora_dense = load_displacement_data('zapora_displ.csv', 'Descending 51')
+displacement_data_zapora_dense = load_displacement_data('zapora_displ.csv', 
+                                                      'Descending 51')
 displacement_data_zapora_dense['pid'] = displacement_data_zapora_dense['pid'].astype(str).str.strip() 
 all_data_zapora_dense = pd.merge(displacement_data_zapora_dense, geo_data_zapora_dense, on='pid', how='left')
 
-displacement_data_koz_dense = load_displacement_data('final_koz.csv', 'Descending 22')
+displacement_data_koz_dense = load_displacement_data('final_koz.csv', 
+                                                      'Descending 22')
 displacement_data_koz_dense['pid'] = displacement_data_koz_dense['pid'].astype(str).str.strip() 
 all_data_koz_dense = pd.merge(displacement_data_koz_dense, geo_data_koz_dense, on='pid', how='left')
 
-displacement_data_top_dense = load_displacement_data('final_top.csv', 'Descending 22')
+displacement_data_top_dense = load_displacement_data('final_top.csv', 
+                                                      'Descending 22')
 displacement_data_top_dense['pid'] = displacement_data_top_dense['pid'].astype(str).str.strip() 
 all_data_top_dense = pd.merge(displacement_data_top_dense, geo_data_top_dense, on='pid', how='left')
 
-displacement_data_nysa_dense = load_displacement_data('final_nysa.csv', 'Descending 22')
+displacement_data_nysa_dense = load_displacement_data('final_nysa.csv', 
+                                                      'Descending 22')
 displacement_data_nysa_dense['pid'] = displacement_data_nysa_dense['pid'].astype(str).str.strip() 
 all_data_nysa_dense = pd.merge(displacement_data_nysa_dense, geo_data_nysa_dense, on='pid', how='left')
 
-displacement_data_otm_dense = load_displacement_data('final_otm.csv', 'Descending 22')
+displacement_data_otm_dense = load_displacement_data('final_otm.csv', 
+                                                      'Descending 22')
 displacement_data_otm_dense['pid'] = displacement_data_otm_dense['pid'].astype(str).str.strip() 
 all_data_otm_dense = pd.merge(displacement_data_otm_dense, geo_data_otm_dense, on='pid', how='left')
 
 prediction_data_1 = pd.read_csv('predictions_values.csv')
-prediction_data_1 = prediction_data_1.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_1 = prediction_data_1.melt(var_name='pid', 
+                                           value_name='predicted_displacement')
 prediction_data_1['label'] = 'Prediction Set 1'
 prediction_data_1['step'] = prediction_data_1.groupby('pid').cumcount()
 
 prediction_data_2 = pd.read_csv('predictions_values2.csv') 
-prediction_data_2 = prediction_data_2.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_2 = prediction_data_2.melt(var_name='pid', 
+                                           value_name='predicted_displacement')
 prediction_data_2['label'] = 'Prediction Set 2'
 prediction_data_2['step'] = prediction_data_2.groupby('pid').cumcount()
 
 prediction_data_3 = pd.read_csv('predictions_values3.csv') 
-prediction_data_3 = prediction_data_3.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_3 = prediction_data_3.melt(var_name='pid', 
+                                           value_name='predicted_displacement')
 prediction_data_3['label'] = 'Prediction Set 3'
 prediction_data_3['step'] = prediction_data_3.groupby('pid').cumcount()
 
 prediction_data_4 = pd.read_csv('predictions_values4.csv') 
-prediction_data_4 = prediction_data_4.melt(var_name='pid', value_name='predicted_displacement')
+prediction_data_4 = prediction_data_4.melt(var_name='pid', 
+                                           value_name='predicted_displacement')
 prediction_data_4['label'] = 'Prediction Set 4'
 prediction_data_4['step'] = prediction_data_4.groupby('pid').cumcount()
 
@@ -131,6 +142,51 @@ prediction_data_otm_dense = pd.read_csv('predictions_otm_dense.csv', delimiter='
 prediction_data_otm_dense = prediction_data_otm_dense.melt(var_name='pid', value_name='predicted_displacement')
 prediction_data_otm_dense['label'] = 'DENSE OTM Prediction Set'
 prediction_data_otm_dense['step'] = prediction_data_otm_dense.groupby('pid').cumcount()
+
+anomaly_data_1_95 = load_anomaly_data('anomaly_output_95.csv', 'Anomaly Set 1 (95%)')
+anomaly_data_2_95 = load_anomaly_data('anomaly_output2_95.csv', 'Anomaly Set 2 (95%)')
+anomaly_data_3_95 = load_anomaly_data('anomaly_output3_95.csv', 'Anomaly Set 3 (95%)')
+anomaly_data_4_95 = load_anomaly_data('anomaly_output4_95.csv', 'Anomaly Set 4 (95%)')
+
+all_anomaly_data_95_wroclaw = pd.concat([anomaly_data_1_95, anomaly_data_2_95, anomaly_data_3_95, anomaly_data_4_95], ignore_index=True)
+
+anomaly_data_1_99 = load_anomaly_data('anomaly_output_99.csv', 'Anomaly Set 1 (99%)')
+anomaly_data_2_99 = load_anomaly_data('anomaly_output2_99 .csv', 'Anomaly Set 2 (99%)')
+anomaly_data_3_99 = load_anomaly_data('anomaly_output3_99.csv', 'Anomaly Set 3 (99%)')
+anomaly_data_4_99 = load_anomaly_data('anomaly_output4_99.csv', 'Anomaly Set 4 (99%)')
+
+all_anomaly_data_99_wroclaw = pd.concat([anomaly_data_1_99, anomaly_data_2_99, anomaly_data_3_99, anomaly_data_4_99], ignore_index=True)
+
+anomaly_data_zapora_95_dense = load_anomaly_data('anomaly_zapora_dense_95.csv', 'Anomaly Set 8 DENSE (95%)')
+anomaly_data_zapora_95_dense = anomaly_data_zapora_95_dense.groupby('pid').head(60)
+
+anomaly_data_zapora_99_dense = load_anomaly_data('anomaly_zapora_dense_99.csv', 'Anomaly Set 8 DENSE (99%)')
+anomaly_data_zapora_99_dense = anomaly_data_zapora_99_dense.groupby('pid').head(60)
+
+anomaly_data_koz_95_dense = load_anomaly_data('anomaly_koz_dense_95.csv', 'Anomaly Set 9 DENSE (95%)')
+anomaly_data_koz_95_dense = anomaly_data_koz_95_dense.groupby('pid').head(60)
+
+anomaly_data_koz_99_dense = load_anomaly_data('anomaly_koz_dense_99.csv', 'Anomaly Set 9 DENSE (99%)')
+anomaly_data_koz_99_dense = anomaly_data_koz_99_dense.groupby('pid').head(60)
+
+anomaly_data_top_95_dense = load_anomaly_data('anomaly_top_dense_95.csv', 'Anomaly Set 10 DENSE (95%)')
+anomaly_data_top_95_dense = anomaly_data_top_95_dense.groupby('pid').head(60)
+
+anomaly_data_top_99_dense = load_anomaly_data('anomaly_top_dense_99.csv', 'Anomaly Set 10 DENSE (99%)')
+anomaly_data_top_99_dense = anomaly_data_top_99_dense.groupby('pid').head(60)
+
+anomaly_data_nysa_95_dense = load_anomaly_data('anomaly_nysa_dense_95.csv', 'Anomaly Set 11 DENSE (95%)')
+anomaly_data_nysa_95_dense = anomaly_data_nysa_95_dense.groupby('pid').head(60)
+
+anomaly_data_nysa_99_dense = load_anomaly_data('anomaly_nysa_dense_99.csv', 'Anomaly Set 11 DENSE (99%)')
+anomaly_data_nysa_99_dense = anomaly_data_nysa_99_dense.groupby('pid').head(60)
+
+anomaly_data_otm_95_dense = load_anomaly_data('anomaly_otm_dense_95.csv', 'Anomaly Set 12 DENSE (95%)')
+anomaly_data_otm_95_dense = anomaly_data_otm_95_dense.groupby('pid').head(60)
+
+anomaly_data_otm_99_dense = load_anomaly_data('anomaly_otm_dense_99.csv', 'Anomaly Set 12 DENSE (99%)')
+anomaly_data_otm_99_dense = anomaly_data_otm_99_dense.groupby('pid').head(60)
+
 
 all_data_wroclaw.sort_values(by=['pid', 'timestamp'], inplace=True)
 all_data_wroclaw['displacement_diff'] = all_data_wroclaw.groupby('pid')['displacement'].diff().round(1)
