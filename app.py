@@ -302,7 +302,7 @@ MAX_KOZIELNO = koz_dense_prefix.columns.max()
 MAX_TOPOLA = top_dense_prefix.columns.max()
 MAX_NYSA = nysa_dense_prefix.columns.max()
 MAX_OTMUCHOW = otm_dense_prefix.columns.max()
-MAX_RACIBORZ = rac_dense-prefix.columns.max()
+MAX_RACIBORZ = rac_dense_prefix.columns.max()
 
 def add_obs_step(df):
     df = df.sort_values(by=['pid', 'timestamp'])
