@@ -718,7 +718,7 @@ def display_selected_dates(range_value, selected_area):
     start_val, end_val = range_value
     data_for_area = {
         'wroclaw': all_data_wroclaw,
-        'raciborz': all_data_rac,
+        'raciborz': all_data_rac_dense,
         'kozielno': all_data_koz_dense,
         'topola': all_data_top_dense,
         'nysa': all_data_nysa_dense,
@@ -765,7 +765,7 @@ def update_slider_max(selected_area, color_mode):
         
     data_for_area = {
         'wroclaw': all_data_wroclaw,
-        'raciborz': all_data_rac,
+        'raciborz': all_data_rac_dense,
         'kozielno': all_data_koz_dense,
         'nysa': all_data_nysa_dense,
         'otmuchow': all_data_otm_dense,
