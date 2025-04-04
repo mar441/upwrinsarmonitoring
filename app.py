@@ -805,7 +805,7 @@ def update_map(map_style, color_mode, orbit_filter, selected_area, pred_range, p
         zoom_level = 14
     elif selected_area == 'raciborz':
         data = all_data_rac_dense.drop_duplicates(subset=['pid'])
-        center_coords = {'lat': data['latitude'].mean(), 'lon': data['longitude'}.mean()}
+        center_coords = {'lat': data['latitude'].mean(), 'lon': data['longitude'].mean()}
         zoom_level = 12
         orbit_filter = ['Ascending 175']
     elif selected_area == 'kozielno':
