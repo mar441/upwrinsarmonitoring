@@ -626,7 +626,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         else:  
             vmin, vmax = custom_min, custom_max
 
-        fig = px.scatter_mapbox(
+        fig = px.scatter_map(
             merged_data,
             lat='latitude',
             lon='longitude',
@@ -667,7 +667,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         else:  
             vmin, vmax = custom_min, custom_max
 
-        fig = px.scatter_mapbox(
+        fig = px.scatter_map(
             merged_data,
             lat='latitude',
             lon='longitude',
@@ -690,7 +690,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
             merged_data.groupby('pid')['is_anomaly'].rolling(3, min_periods=3).sum().reset_index(0, drop=True))
         merged_data['anomaly_3plus'] = merged_data['consecutive_anomalies'] >= 3
 
-        fig = px.scatter_mapbox(
+        fig = px.scatter_map(
             merged_data,
             lat='latitude', lon='longitude',
             hover_name='pid',
@@ -703,7 +703,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         fig.update_layout(legend_title_text='Anomaly Type')
 
     elif color_mode == 'orbit':
-        fig = px.scatter_mapbox(
+        fig = px.scatter_map(
             filtered_data,
             lat='latitude',
             lon='longitude',
@@ -727,7 +727,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         else:
             vmin, vmax = custom_min, custom_max
 
-        fig = px.scatter_mapbox(
+        fig = px.scatter_map(
             filtered_data,
             lat='latitude',
             lon='longitude',
