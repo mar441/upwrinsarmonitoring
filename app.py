@@ -106,7 +106,8 @@ orbit_geometry_info = {
         'Mean Incidence angle': '33.18°'  
     }}
 
-px.set_mapbox_access_token('pk.eyJ1IjoibnBpZWsiLCJhIjoiY21jN2tvYXE1MTRqeTJrc2NtaTlvNXQyZSJ9.abg-EkfnNKp7bgwEvgRp0w')
+
+px.set_mapbox_access_token(os.getenv("MAPBOX_TOKEN"))
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -115,7 +116,7 @@ app.layout = html.Div([
 
     html.Div([
         html.H3("Select Map and Data Visualization Options", 
-                style={'display': 'inline-block', 'margin-right': '20px'}),
+                style={'display': 'inline-block', 'marginRight': '20px'}),
         html.Div([
             html.Button(
                 "Info", 
@@ -134,7 +135,7 @@ app.layout = html.Div([
                        'borderRadius': '5px', 'border': '1px solid #ccc'}
             )
         ], style={'display': 'flex', 'alignItems': 'center'})
-    ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'}),
+    ], style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center'}),
 
     dbc.Modal(
         [
@@ -302,8 +303,8 @@ app.layout = html.Div([
                 style={'width': '100%'}
             )
         ], style={'display': 'inline-block', 'width': '16%', 'padding': '10px'}),
-    ], style={'width': '100%', 'display': 'flex', 'justify-content': 'space-between'}),
-    html.Div(id='distance-output', style={'font-size': '16px', 'padding': '10px', 'color': 'black'}),
+    ], style={'width': '100%', 'display': 'flex', 'justifyContent': 'space-between'}),
+    html.Div(id='distance-output', style={'fontSize': '16px', 'padding': '10px', 'color': 'black'}),
     html.Div(
         id='prediction-method-container',
         children=[
@@ -345,15 +346,15 @@ app.layout = html.Div([
         id='displacement-container',
         children=[
             html.Div([
-                html.Label("Select Date Range", style={'font-size': '16px'}),
+                html.Label("Select Date Range", style={'fontSize': '16px'}),
                 dcc.DatePickerRange(
                     id='date-range-picker',
                     start_date=all_data_nysa_ml['timestamp'].min(),
                     end_date=all_data_nysa_ml['timestamp'].max(),
                     display_format='YYYY-MM-DD',
                     style={
-                        'height': '5px', 'width': '300px', 'font-family': 'Arial',
-                        'font-size': '4px', 'display': 'inline-block', 'padding': '5px'
+                        'height': '5px', 'width': '300px', 'fontFamily': 'Arial',
+                        'fontSize': '4px', 'display': 'inline-block', 'padding': '5px'
                     }
                 )
             ], style={'display': 'inline-block', 'padding': '10px'}),
@@ -363,7 +364,7 @@ app.layout = html.Div([
                     id='y-axis-min',
                     type='number',
                     placeholder='Min',
-                    style={'width': '20%', 'margin-right': '10px'}
+                    style={'width': '20%', 'marginRight': '10px'}
                 ),
                 dcc.Input(
                     id='y-axis-max',
