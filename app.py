@@ -32,23 +32,23 @@ def load_anomaly_data(file_path, file_label):
     df['pid'] = df['pid'].astype(str)
     return df
 
-geo_data_nysa_ml = pd.read_csv('grunwald_geo.csv', delimiter=';')
+geo_data_nysa_ml = pd.read_csv('rac_geo.csv', delimiter=',')
 geo_data_nysa_ml['pid'] = geo_data_nysa_ml['pid'].astype(str).str.strip()
 
-displacement_data_nysa_ml = load_displacement_data('grunwald_displ.csv', 'Descending 22')
+displacement_data_nysa_ml = load_displacement_data('final_rac.csv', 'Acending 175')
 displacement_data_nysa_ml['pid'] = displacement_data_nysa_ml['pid'].astype(str).str.strip() 
 all_data_nysa_ml = pd.merge(displacement_data_nysa_ml, geo_data_nysa_ml, on='pid', how='left')
 
-prediction_data_nysa_ml = pd.read_csv('predictions_grunwald.csv', delimiter=',')
+prediction_data_nysa_ml = pd.read_csv('predictions.csv', delimiter=',')
 prediction_data_nysa_ml = prediction_data_nysa_ml.melt(var_name='pid', value_name='predicted_displacement')
 prediction_data_nysa_ml['label'] = 'ML Nysa Prediction Set'
 prediction_data_nysa_ml['step'] = prediction_data_nysa_ml.groupby('pid').cumcount()
 
-anomaly_data_nysa_95_ml = load_anomaly_data('anomaly_grunwald_auto_95.csv', 'Anomaly Set 1 ML (95%)')
-anomaly_data_nysa_95_ml = anomaly_data_nysa_95_ml.groupby('pid').head(61)
+anomaly_data_nysa_95_ml = load_anomaly_data('anomaly_rac_95.csv', 'Anomaly Set 1 ML (95%)')
+anomaly_data_nysa_95_ml = anomaly_data_nysa_95_ml.groupby('pid').head(62)
 
-anomaly_data_nysa_99_ml = load_anomaly_data('anomaly_grunwald_auto_99.csv', 'Anomaly Set 1 ML (99%)')
-anomaly_data_nysa_99_ml = anomaly_data_nysa_99_ml.groupby('pid').head(61)
+anomaly_data_nysa_99_ml = load_anomaly_data('anomaly_rac_99.csv', 'Anomaly Set 1 ML (99%)')
+anomaly_data_nysa_99_ml = anomaly_data_nysa_99_ml.groupby('pid').head(62)
 
 all_data_nysa_ml.sort_values(by=['pid', 'timestamp'], inplace=True)
 all_data_nysa_ml['displacement_diff'] = all_data_nysa_ml.groupby('pid')['displacement'].diff().round(1)
@@ -100,10 +100,11 @@ actual_prefix_data = {
 MAX_ACTUAL_NYSA = actual_nysa_ml_prefix.columns.max()
 
 orbit_geometry_info = {
-    'Descending 22': {
-        'Relative orbit number': '22',
-        'View angle': '191.28°', 
-        'Mean Incidence angle': '31.85°'}}
+    'Ascending 175': {
+        'Relative orbit number': '175',
+        'View angle': '348.9°',
+        'Mean Incidence angle': '33.18°'  
+    }}
 
 px.set_mapbox_access_token('pk.eyJ1IjoibnBpZWsiLCJhIjoiY203bG5vZm9hMGRkMDJscjB0cG44OWFoOCJ9.HrzUxjpcUzYd9LiYuoVWnw')
 
@@ -266,7 +267,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='orbit-filter-dropdown',
                 options=[
-                    {'label': 'Descending 22', 'value': 'Descending 22'},
+                    {'label': 'Ascending 175', 'value': 'Ascending 175'},
                 ],
                 value='Ascending 175',
                 multi=True,
@@ -279,7 +280,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='area-dropdown',
                 options=[
-                    {'label': 'Plac Grunwaldzki - Wrocław', 'value': 'nysa'},
+                    {'label': 'Zbiornik Racibórz Dolny', 'value': 'nysa'},
                 ],
                 value='nysa',
                 clearable=False,
@@ -310,7 +311,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='prediction-method-dropdown',
                 options=[
-                    {'label': 'ML', 'value': 'ml'}
+                    {'label': 'XGBoost', 'value': 'ml'}
                 ],
                 value='ml',
                 clearable=False,
