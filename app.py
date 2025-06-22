@@ -35,7 +35,7 @@ def load_anomaly_data(file_path, file_label):
 geo_data_nysa_ml = pd.read_csv('rac_geo.csv', delimiter=',')
 geo_data_nysa_ml['pid'] = geo_data_nysa_ml['pid'].astype(str).str.strip()
 
-displacement_data_nysa_ml = load_displacement_data('final_rac.csv', 'Acending 175')
+displacement_data_nysa_ml = load_displacement_data('final_rac.csv', 'Ascending 175')
 displacement_data_nysa_ml['pid'] = displacement_data_nysa_ml['pid'].astype(str).str.strip() 
 all_data_nysa_ml = pd.merge(displacement_data_nysa_ml, geo_data_nysa_ml, on='pid', how='left')
 
