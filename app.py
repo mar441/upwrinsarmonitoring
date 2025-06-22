@@ -107,7 +107,7 @@ orbit_geometry_info = {
     }}
 
 
-px.set_mapbox_access_token(os.getenv("MAPBOX_TOKEN"))
+px.set_mapbox_access_token('pk.eyJ1IjoibnBpZWsiLCJhIjoiY21jN2tvYXE1MTRqeTJrc2NtaTlvNXQyZSJ9.abg-EkfnNKp7bgwEvgRp0w')
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -116,7 +116,7 @@ app.layout = html.Div([
 
     html.Div([
         html.H3("Select Map and Data Visualization Options", 
-                style={'display': 'inline-block', 'marginRight': '20px'}),
+                style={'display': 'inline-block', 'margin-right': '20px'}),
         html.Div([
             html.Button(
                 "Info", 
@@ -135,7 +135,7 @@ app.layout = html.Div([
                        'borderRadius': '5px', 'border': '1px solid #ccc'}
             )
         ], style={'display': 'flex', 'alignItems': 'center'})
-    ], style={'display': 'flex', 'justifyContent': 'space-between', 'alignItems': 'center'}),
+    ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'}),
 
     dbc.Modal(
         [
@@ -281,7 +281,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='area-dropdown',
                 options=[
-                    {'label': 'Zbiornik Racibórz Dolny', 'value': 'nysa'},
+                    {'label': 'Plac Grunwaldzki - Wrocław', 'value': 'nysa'},
                 ],
                 value='nysa',
                 clearable=False,
@@ -303,8 +303,8 @@ app.layout = html.Div([
                 style={'width': '100%'}
             )
         ], style={'display': 'inline-block', 'width': '16%', 'padding': '10px'}),
-    ], style={'width': '100%', 'display': 'flex', 'justifyContent': 'space-between'}),
-    html.Div(id='distance-output', style={'fontSize': '16px', 'padding': '10px', 'color': 'black'}),
+    ], style={'width': '100%', 'display': 'flex', 'justify-content': 'space-between'}),
+    html.Div(id='distance-output', style={'font-size': '16px', 'padding': '10px', 'color': 'black'}),
     html.Div(
         id='prediction-method-container',
         children=[
@@ -312,7 +312,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='prediction-method-dropdown',
                 options=[
-                    {'label': 'XGBoost', 'value': 'ml'}
+                    {'label': 'ML', 'value': 'ml'}
                 ],
                 value='ml',
                 clearable=False,
@@ -346,15 +346,15 @@ app.layout = html.Div([
         id='displacement-container',
         children=[
             html.Div([
-                html.Label("Select Date Range", style={'fontSize': '16px'}),
+                html.Label("Select Date Range", style={'font-size': '16px'}),
                 dcc.DatePickerRange(
                     id='date-range-picker',
                     start_date=all_data_nysa_ml['timestamp'].min(),
                     end_date=all_data_nysa_ml['timestamp'].max(),
                     display_format='YYYY-MM-DD',
                     style={
-                        'height': '5px', 'width': '300px', 'fontFamily': 'Arial',
-                        'fontSize': '4px', 'display': 'inline-block', 'padding': '5px'
+                        'height': '5px', 'width': '300px', 'font-family': 'Arial',
+                        'font-size': '4px', 'display': 'inline-block', 'padding': '5px'
                     }
                 )
             ], style={'display': 'inline-block', 'padding': '10px'}),
@@ -364,7 +364,7 @@ app.layout = html.Div([
                     id='y-axis-min',
                     type='number',
                     placeholder='Min',
-                    style={'width': '20%', 'marginRight': '10px'}
+                    style={'width': '20%', 'margin-right': '10px'}
                 ),
                 dcc.Input(
                     id='y-axis-max',
@@ -519,7 +519,7 @@ def toggle_prediction_method_dropdown(selected_area):
 )
 def update_orbit_filter(selected_area):
     if selected_area == 'nysa':
-        return [{'label': 'Ascending 175', 'value': 'Ascending 175'}], 'Ascending 175', True
+        return [{'label': 'Ascending 175', 'value': 'Ascending 175'}], 'Ascending 22', True
 
 @app.callback(
     [Output('dynamic-prediction-range-slider', 'max'),
@@ -584,8 +584,8 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
                color_scale_selected,range_choice,custom_min,custom_max):
     if selected_area == 'nysa':
         data = all_data_nysa_ml.drop_duplicates(subset=['pid'])
-        center_coords = {'lat': data['latitude'].mean(), 'lon': data['longitude'].mean()}
-        zoom_level = 11
+        center_coords = {'lat': 51.11249671461431, 'lon': 17.06133312265709}
+        zoom_level = 14
         orbit_filter = ['Ascending 175']
 
     if isinstance(orbit_filter, str):
@@ -627,7 +627,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         else:  
             vmin, vmax = custom_min, custom_max
 
-        fig = px.scatter_map(
+        fig = px.scatter_mapbox(
             merged_data,
             lat='latitude',
             lon='longitude',
@@ -668,7 +668,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         else:  
             vmin, vmax = custom_min, custom_max
 
-        fig = px.scatter_map(
+        fig = px.scatter_mapbox(
             merged_data,
             lat='latitude',
             lon='longitude',
@@ -691,7 +691,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
             merged_data.groupby('pid')['is_anomaly'].rolling(3, min_periods=3).sum().reset_index(0, drop=True))
         merged_data['anomaly_3plus'] = merged_data['consecutive_anomalies'] >= 3
 
-        fig = px.scatter_map(
+        fig = px.scatter_mapbox(
             merged_data,
             lat='latitude', lon='longitude',
             hover_name='pid',
@@ -704,7 +704,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         fig.update_layout(legend_title_text='Anomaly Type')
 
     elif color_mode == 'orbit':
-        fig = px.scatter_map(
+        fig = px.scatter_mapbox(
             filtered_data,
             lat='latitude',
             lon='longitude',
@@ -728,7 +728,7 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
         else:
             vmin, vmax = custom_min, custom_max
 
-        fig = px.scatter_map(
+        fig = px.scatter_mapbox(
             filtered_data,
             lat='latitude',
             lon='longitude',
