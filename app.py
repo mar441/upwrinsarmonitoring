@@ -584,8 +584,8 @@ def update_map(map_style,color_mode,orbit_filter,selected_area,pred_range,predic
                color_scale_selected,range_choice,custom_min,custom_max):
     if selected_area == 'nysa':
         data = all_data_nysa_ml.drop_duplicates(subset=['pid'])
-        center_coords = {'lat': 51.11249671461431, 'lon': 17.06133312265709}
-        zoom_level = 14
+        center_coords = {'lat': data['latitude'].mean(), 'lon': data['longitude'].mean()}
+        zoom_level = 11
         orbit_filter = ['Ascending 175']
 
     if isinstance(orbit_filter, str):
