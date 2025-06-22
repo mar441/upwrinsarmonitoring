@@ -518,7 +518,7 @@ def toggle_prediction_method_dropdown(selected_area):
 )
 def update_orbit_filter(selected_area):
     if selected_area == 'nysa':
-        return [{'label': 'Descending 22', 'value': 'Descending 22'}], 'Ascending 22', True
+        return [{'label': 'Ascending 175', 'value': 'Ascending 175'}], 'Ascending 175', True
 
 @app.callback(
     [Output('dynamic-prediction-range-slider', 'max'),
