@@ -143,7 +143,7 @@ app.layout = html.Div([
             dbc.ModalBody(
                 html.Div([
                     html.Iframe(
-                        src="https://mar441.github.io/upwrinsarmonitoring/INSTRUKCJA_OBSLUGI_SERWISU.html",
+                        src="https://mar441.github.io/upwrinsarmonitoring_projekt/INSTRUKCJA_OBSLUGI_SERWISU.html",
                         style={"height": "90vh", "width": "100%"}
                     )
                 ])
@@ -281,7 +281,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='area-dropdown',
                 options=[
-                    {'label': 'Plac Grunwaldzki - Wrocław', 'value': 'nysa'},
+                    {'label': 'Zbiornik Racibórz Dolny', 'value': 'nysa'},
                 ],
                 value='nysa',
                 clearable=False,
@@ -312,7 +312,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='prediction-method-dropdown',
                 options=[
-                    {'label': 'ML', 'value': 'ml'}
+                    {'label': 'XGBoost', 'value': 'ml'}
                 ],
                 value='ml',
                 clearable=False,
